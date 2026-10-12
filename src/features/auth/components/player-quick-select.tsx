@@ -24,7 +24,15 @@ export function PlayerQuickSelect({
         <span>CHẠM TÊN CỦA BẠN ĐỂ ĐĂNG NHẬP NHANH:</span>
         <UserCheck className="w-3.5 h-3.5 text-green-500" />
       </span>
-      <div className="flex flex-wrap gap-1.5 max-h-28 overflow-y-auto pr-1">
+      <div className="flex flex-wrap gap-1.5 max-h-36 overflow-y-auto p-1.5
+        [&::-webkit-scrollbar]:w-1.5
+        [&::-webkit-scrollbar-track]:rounded-full
+        [&::-webkit-scrollbar-track]:bg-zinc-200
+        dark:[&::-webkit-scrollbar-track]:bg-zinc-700
+        [&::-webkit-scrollbar-thumb]:rounded-full
+        [&::-webkit-scrollbar-thumb]:bg-[#DC2626]
+        [&::-webkit-scrollbar-thumb]:hover:bg-[#991B1B]
+      ">
         {playerOptions.map((p) => {
           const isSelected = selectedUsername === p.username;
           return (
