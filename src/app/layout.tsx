@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { Plus_Jakarta_Sans, Inter } from 'next/font/google';
+import { Plus_Jakarta_Sans, Inter, Dancing_Script } from 'next/font/google';
 import './globals.css';
 
 const plusJakartaSans = Plus_Jakarta_Sans({
@@ -10,6 +10,12 @@ const plusJakartaSans = Plus_Jakarta_Sans({
 
 const inter = Inter({
   variable: '--font-body',
+  subsets: ['latin', 'vietnamese'],
+  weight: ['400', '500', '600', '700'],
+});
+
+const dancingScript = Dancing_Script({
+  variable: '--font-dancing-script',
   subsets: ['latin', 'vietnamese'],
   weight: ['400', '500', '600', '700'],
 });
@@ -27,7 +33,7 @@ export default function RootLayout({
   return (
     <html
       lang="vi"
-      className={`${plusJakartaSans.variable} ${inter.variable} dark h-full antialiased`}
+      className={`${plusJakartaSans.variable} ${inter.variable} ${dancingScript.variable} dark h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-[#0F1218] text-[#F8FAFC] font-body selection:bg-[#DC2626] selection:text-white">
         {children}

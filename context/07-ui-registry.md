@@ -59,6 +59,7 @@ Hệ thống thiết kế giao diện **Crimson Arena** cho sự kiện Astar 20
 
 | Trang / Màn Hình | File Thiết Kế Mẫu | Component Đặc Trưng |
 | :--- | :--- | :--- |
+| **Banner sự kiện (`/`)** | [`public/landing/women-day-20-10.png`](file:///Users/thinhte/Downloads/asx/a-star-20-10/public/landing/women-day-20-10.png) | • Poster hoa hồng đỏ trắng, ruy băng và dòng chữ vàng 20/10<br>• Nút vàng `Vào sự kiện` dẫn tới `/login` |
 | **Đăng nhập (`/login`)** | [`design/sign-in.html`](file:///Users/Astar/Node/astar_20_10/design/sign-in.html) | • Biểu tượng Ngôi sao Đỏ nổi bật<br>• Input ngày sinh DDMM kèm icon hiện/ẩn<br>• Banner báo lỗi sai tên/mật khẩu<br>• Thẻ bảo đảm minh bạch |
 | **Bình chọn (`/vote`)** | [`design/voting.html`](file:///Users/Astar/Node/astar_20_10/design/voting.html) | • Khung ảnh chân dung **4 góc L-shaped đỏ**<br>• Danh sách radio chọn tên bo tròn 12px<br>• Thanh tiến độ mỏng đỏ (CÂU 5/14)<br>• Sticky Action Deck bám đáy ngón cái |
 | **Quản trị (`/admin`)** | [`design/manage.html`](file:///Users/Astar/Node/astar_20_10/design/manage.html) | • Stepper 4 bước có đường line kết nối<br>• Nút mở/đóng vote to bản có bóng đỏ<br>• Grid 3 cột chỉ số (Đã nộp, Đang làm, Chưa vào)<br>• Modal xác nhận Reset an toàn |

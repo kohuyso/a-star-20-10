@@ -14,7 +14,9 @@
 
 ```mermaid
 graph TD
-    A[Màn hình Đăng nhập /login] -->|Thành công| B[Màn hình Chờ / Sảnh]
+    L[Banner sự kiện /] -->|Chưa đăng nhập| A[Màn hình Đăng nhập /login]
+    L -->|Đã đăng nhập| B
+    A -->|Thành công| B[Màn hình Chờ / Sảnh]
     B -->|Admin Mở Vote| C[Màn hình Bỏ Phiếu /vote]
     C -->|Hoàn thành 14 câu| D[Màn hình Chờ Kết Quả]
     
@@ -22,6 +24,10 @@ graph TD
     E -->|Chuyển trạng thái| G[Mở / Đóng Vote]
     E -->|Kích hoạt| H[Màn hình Công Bố /results]
 ```
+
+### 2.0. Banner sự kiện (`/`)
+- Tấm poster toàn màn hình cho khách chưa có phiên: ảnh chúc mừng Ngày Phụ nữ Việt Nam 20/10, nút **Vào sự kiện** dẫn tới `/login`.
+- Người chơi đã đăng nhập vào thẳng `/vote`. Admin vào thẳng `/admin`.
 
 ### 2.1. Màn hình Đăng nhập (`/login`)
 - Người chơi nhập Tên và Ngày sinh (Mật khẩu được seed từ trước).

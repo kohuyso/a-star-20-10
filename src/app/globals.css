@@ -76,6 +76,7 @@
 
   --font-headline: var(--font-headline);
   --font-body: var(--font-body);
+  --font-dancing-script: var(--font-dancing-script);
 }
 
 .font-headline {
@@ -84,6 +85,10 @@
 
 .font-body {
   font-family: var(--font-body), sans-serif;
+}
+
+.font-script {
+  font-family: var(--font-dancing-script), cursive;
 }
 
 /* Glassmorphism & Custom Card Utilities */

@@ -91,3 +91,11 @@
       2. Khai báo `export const dynamic = 'force-dynamic'` tại [src/app/page.tsx](file:///Users/Astar/Node/astar_20_10/src/app/page.tsx).
       3. Trong [src/lib/auth.ts](file:///Users/Astar/Node/astar_20_10/src/lib/auth.ts), rethrow các lỗi internal có `digest` của Next.js thay vì swallow và ghi log lỗi giả.
       4. Kiểm tra: `yarn build` thành công 100% trong ~3 giây, `yarn tsc --noEmit` và `yarn test` 12/12 unit tests pass.
+  - **Cập nhật font banner trang đích (`/`) sang Dancing Script**:
+    - **Yêu cầu**: Thay đổi câu chúc *"Tôn vinh vẻ đẹp và giá trị của chị em Astar Group"* trong poster/banner trang chủ sang font **Dancing Script** mềm mại, uyển chuyển.
+    - **Thực hiện**:
+      - Xử lý inpaint nền poster hoa hồng đỏ trắng tại `public/landing/women-day-20-10.png` để xóa sạch chữ cũ không để lại vết tì.
+      - Tái dựng dòng chữ 2 dòng với font Google `Dancing Script` (SemiBold 600, tone màu đỏ rượu vang `#460C10` hài hòa với màu đỏ Crimson Arena).
+      - Đăng ký Google font `Dancing_Script` vào `src/app/layout.tsx` (`--font-dancing-script`) và `src/app/globals.css` (`.font-script`).
+      - Typecheck `yarn tsc --noEmit` và unit test `yarn vitest run` 12/12 pass.
+

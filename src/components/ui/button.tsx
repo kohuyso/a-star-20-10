@@ -1,4 +1,5 @@
 import React from 'react';
+import Link from 'next/link';
 import { clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 
@@ -6,6 +7,7 @@ export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElemen
   variant?: 'primary' | 'secondary' | 'gold' | 'outline' | 'ghost';
   size?: 'sm' | 'md' | 'lg';
   isLoading?: boolean;
+  href?: string;
 }
 
 export function Button({
@@ -13,6 +15,7 @@ export function Button({
   variant = 'primary',
   size = 'md',
   isLoading = false,
+  href,
   className,
   disabled,
   ...props
@@ -34,16 +37,27 @@ export function Button({
     lg: 'text-base px-6 py-3.5 h-13 gap-2.5',
   };
 
-  return (
-    <button
-      className={twMerge(clsx(baseStyles, variants[variant], sizes[size], className))}
-      disabled={disabled || isLoading}
-      {...props}
-    >
+  const classes = twMerge(clsx(baseStyles, variants[variant], sizes[size], className));
+  const content = (
+    <>
       {isLoading ? (
         <span className="inline-block w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
       ) : null}
       {children}
+    </>
+  );
+
+  if (href) {
+    return (
+      <Link href={href} className={classes} aria-disabled={disabled || isLoading || undefined}>
+        {content}
+      </Link>
+    );
+  }
+
+  return (
+    <button className={classes} disabled={disabled || isLoading} {...props}>
+      {content}
     </button>
   );
 }
