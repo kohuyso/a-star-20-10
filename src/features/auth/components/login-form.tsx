@@ -34,8 +34,7 @@ export function LoginForm({
           htmlFor="usernameInput"
           className="font-headline text-xs font-bold text-zinc-700 dark:text-zinc-300 flex items-center justify-between"
         >
-          <span>HỌ VÀ TÊN / TÀI KHOẢN</span>
-          <span className="text-[10px] font-normal text-zinc-400">nguyen.nam</span>
+          <span>TÀI KHOẢN / HỌ VÀ TÊN</span>
         </label>
         <div className="relative flex items-center">
           <div className="absolute left-3.5 text-zinc-400 pointer-events-none">
@@ -47,7 +46,7 @@ export function LoginForm({
             type="text"
             value={username}
             onChange={(e) => onChangeUsername(e.target.value)}
-            placeholder="Nhập tên đăng nhập..."
+            placeholder="Nhập họ và tên hoặc tài khoản..."
             className="w-full pl-10 pr-4 py-3 bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-200 dark:border-zinc-700/80 rounded-2xl text-sm text-zinc-900 dark:text-white placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-[#DC2626] focus:border-transparent transition-all"
             autoComplete="username"
           />
@@ -60,8 +59,7 @@ export function LoginForm({
           htmlFor="passwordInput"
           className="font-headline text-xs font-bold text-zinc-700 dark:text-zinc-300 flex items-center justify-between"
         >
-          <span>NGÀY SINH (MẬT KHẨU)</span>
-          <span className="text-[10px] font-normal text-zinc-400">Ví dụ: 15/03</span>
+          <span>MẬT KHẨU</span>
         </label>
         <div className="relative flex items-center">
           <div className="absolute left-3.5 text-zinc-400 pointer-events-none">
@@ -73,7 +71,7 @@ export function LoginForm({
             type={showPassword ? 'text' : 'password'}
             value={password}
             onChange={(e) => onChangePassword(e.target.value)}
-            placeholder="Ví dụ: 15/03"
+            placeholder="Nhập mật khẩu..."
             className="w-full pl-10 pr-11 py-3 bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-200 dark:border-zinc-700/80 rounded-2xl text-sm text-zinc-900 dark:text-white placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-[#DC2626] focus:border-transparent transition-all"
             autoComplete="current-password"
           />

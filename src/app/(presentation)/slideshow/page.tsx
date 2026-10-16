@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { Sparkles } from 'lucide-react';
 import { SlideHeader } from '@/features/presentation/components/slide-header';
 import { SlidePhotoDisplay } from '@/features/presentation/components/slide-photo-display';
@@ -64,7 +64,16 @@ export default function SlideshowPage() {
     return () => clearInterval(interval);
   }, []);
 
-  // 3. Tính toán đếm ngược thời gian
+  // 3. Tính toán đếm ngược thời gian tức thì và đồng bộ
+  const calculateRealRemaining = useCallback(() => {
+    if (!gameState?.timerStartedAt || !gameState?.isQuestionActive) return 0;
+    const startMs = new Date(gameState.timerStartedAt).getTime();
+    if (isNaN(startMs)) return 0;
+    const duration = gameState.timerDurationSec || 20;
+    const elapsed = Math.floor((Date.now() - startMs) / 1000);
+    return Math.max(0, duration - elapsed);
+  }, [gameState?.timerStartedAt, gameState?.isQuestionActive, gameState?.timerDurationSec]);
+
   useEffect(() => {
     if (!gameState?.timerStartedAt || !gameState?.isQuestionActive) {
       setTimeLeft(0);
@@ -117,7 +126,13 @@ export default function SlideshowPage() {
 
   const currentQNum = gameState?.currentQuestionNumber || 1;
   const currentQ = questions.find((q) => q.questionNumber === currentQNum) || questions[0];
-  const isVoting = gameState?.isQuestionActive && timeLeft > 0;
+
+  // Thời gian còn lại tức thì, không bị delay bởi 1 frame của useState
+  const currentRemaining = gameState?.isQuestionActive
+    ? (timeLeft > 0 ? timeLeft : calculateRealRemaining())
+    : 0;
+
+  const isVoting = gameState?.isQuestionActive && currentRemaining > 0;
 
   return (
     <div className="dark min-h-screen bg-[#0A0D14] text-white flex flex-col justify-between select-none relative overflow-hidden font-body">
@@ -130,7 +145,7 @@ export default function SlideshowPage() {
         currentQuestionNumber={currentQ.questionNumber}
         totalQuestions={questions.length}
         isVoting={isVoting}
-        timeLeft={timeLeft}
+        timeLeft={currentRemaining}
         showHint={showHint}
         onToggleHint={() => setShowHint(!showHint)}
         onToggleFullScreen={toggleFullScreen}
@@ -143,7 +158,7 @@ export default function SlideshowPage() {
         hint={currentQ.hint}
         showHint={showHint}
         isQuestionActive={gameState?.isQuestionActive}
-        timeLeft={timeLeft}
+        timeLeft={currentRemaining}
         timerDurationSec={gameState?.timerDurationSec}
         timerStartedAt={gameState?.timerStartedAt}
       />

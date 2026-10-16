@@ -232,6 +232,20 @@ export default function AdminPage() {
     window.location.href = '/login';
   };
 
+  const handleToggleGender = async (userId: string, currentGender: string) => {
+    const nextGender = currentGender === 'FEMALE' ? 'MALE' : 'FEMALE';
+    try {
+      await fetch('/api/admin/player/gender', {
+        method: 'POST',
+        headers: getAuthHeaders(),
+        body: JSON.stringify({ userId, gender: nextGender }),
+      });
+      await fetchAdminData();
+    } catch (err) {
+      console.error('Failed to toggle gender:', err);
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-[#0F1218] text-white flex flex-col items-center justify-center p-4 font-body">
@@ -279,6 +293,7 @@ export default function AdminPage() {
         <RosterPlayerTable
           players={players}
           onRefresh={fetchAdminData}
+          onToggleGender={handleToggleGender}
         />
       </main>
 

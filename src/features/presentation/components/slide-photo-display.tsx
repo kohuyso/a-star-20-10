@@ -25,7 +25,7 @@ export function SlidePhotoDisplay({
 }: SlidePhotoDisplayProps) {
   return (
     <main className="relative z-10 flex-1 flex flex-col items-center justify-center p-4 max-w-5xl mx-auto w-full">
-      <div className="relative max-h-[68vh] aspect-square rounded-3xl overflow-hidden shadow-2xl border-4 border-zinc-800/80 bg-zinc-900 flex items-center justify-center w-full">
+      <div className="relative h-[72vh] max-h-[72vh] max-w-5xl w-full rounded-3xl overflow-hidden shadow-2xl border-4 border-zinc-800/80 bg-zinc-950 flex items-center justify-center p-2 sm:p-4">
         <MysteryGridImage
           src={photoUrl}
           alt={`Ảnh bí ẩn #${questionNumber}`}

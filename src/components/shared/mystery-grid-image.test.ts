@@ -33,18 +33,31 @@ function calculateRevealedCount({
 
   const duration = Math.max(1, timerDurationSec || 20);
   const revealTargetDuration = Math.max(1, duration - 10);
+  const startMs = new Date(timerStartedAt).getTime();
+  const elapsed = isNaN(startMs) ? 0 : Math.max(0, Math.floor((Date.now() - startMs) / 1000));
 
   if (!isQuestionActive) {
-    const startMs = new Date(timerStartedAt).getTime();
-    const elapsed = Math.floor((Date.now() - startMs) / 1000);
     if (elapsed >= duration) return totalTiles;
     return 0;
   }
 
-  if (timeLeft <= 10) return totalTiles;
+  // Chống nháy lộ ảnh khi vừa bắt đầu đếm ngược
+  if (elapsed <= 0 && timeLeft <= 0) {
+    return 0;
+  }
 
-  const elapsed = Math.max(0, duration - timeLeft);
-  const progressRatio = Math.min(1, Math.max(0, elapsed / revealTargetDuration));
+  const effectiveRemaining = timeLeft > 0 ? timeLeft : Math.max(0, duration - elapsed);
+
+  if (effectiveRemaining <= 10 && elapsed >= Math.max(0, duration - 10)) {
+    return totalTiles;
+  }
+
+  if (elapsed >= duration) {
+    return totalTiles;
+  }
+
+  const effectiveElapsed = Math.max(0, duration - effectiveRemaining);
+  const progressRatio = Math.min(1, Math.max(0, effectiveElapsed / revealTargetDuration));
   return Math.floor(progressRatio * totalTiles);
 }
 
@@ -78,6 +91,17 @@ describe('MysteryGridImage Logic & Seeded Shuffle', () => {
     expect(revealed).toBe(0);
   });
 
+  it('CHỐNG NHÁY LỘ ẢNH: khi vừa bắt đầu đếm ngược (elapsed <= 0s), dù timeLeft truyền vào ban đầu là 0 vẫn không mở ô nào', () => {
+    const revealed = calculateRevealedCount({
+      totalTiles: 25,
+      isQuestionActive: true,
+      timerStartedAt: new Date().toISOString(), // vừa tạo lúc này
+      timerDurationSec: 20,
+      timeLeft: 0, // bị trễ 1 render cycle của state
+    });
+    expect(revealed).toBe(0);
+  });
+
   it('khi isQuestionActive = false và chưa kết thúc đếm ngược, không bao giờ lộ ảnh dù timeLeft = 0', () => {
     const revealed = calculateRevealedCount({
       totalTiles: 25,
@@ -103,7 +127,7 @@ describe('MysteryGridImage Logic & Seeded Shuffle', () => {
     const revealedAtMid = calculateRevealedCount({
       totalTiles: 25,
       isQuestionActive: true,
-      timerStartedAt: new Date().toISOString(),
+      timerStartedAt: new Date(Date.now() - 10000).toISOString(),
       timerDurationSec: 30,
       timeLeft: 20, // elapsed = 10s -> 50%
     });
@@ -114,7 +138,7 @@ describe('MysteryGridImage Logic & Seeded Shuffle', () => {
     const revealedAt10s = calculateRevealedCount({
       totalTiles: 25,
       isQuestionActive: true,
-      timerStartedAt: new Date().toISOString(),
+      timerStartedAt: new Date(Date.now() - 20000).toISOString(),
       timerDurationSec: 30,
       timeLeft: 10,
     });
@@ -123,7 +147,7 @@ describe('MysteryGridImage Logic & Seeded Shuffle', () => {
     const revealedAt5s = calculateRevealedCount({
       totalTiles: 25,
       isQuestionActive: true,
-      timerStartedAt: new Date().toISOString(),
+      timerStartedAt: new Date(Date.now() - 25000).toISOString(),
       timerDurationSec: 30,
       timeLeft: 5,
     });
@@ -132,7 +156,7 @@ describe('MysteryGridImage Logic & Seeded Shuffle', () => {
     const revealedAtEnd = calculateRevealedCount({
       totalTiles: 25,
       isQuestionActive: true,
-      timerStartedAt: new Date().toISOString(),
+      timerStartedAt: new Date(Date.now() - 30000).toISOString(),
       timerDurationSec: 30,
       timeLeft: 0,
     });

@@ -11,7 +11,7 @@ export interface VotingStatusCardProps {
 export function VotingStatusCard({ type, selectedName, questionNumber }: VotingStatusCardProps) {
   if (type === 'answered') {
     return (
-      <Card className="w-full p-5 rounded-3xl bg-green-50 dark:bg-green-950/40 border border-green-200 dark:border-green-900/50 flex flex-col items-center text-center my-auto">
+      <Card className="w-full p-5 rounded-3xl bg-green-50 dark:bg-green-950/40 border border-green-200 dark:border-green-900/50 flex flex-col items-center text-center my-auto shrink-0">
         <div className="w-12 h-12 rounded-full bg-green-600 text-white flex items-center justify-center mb-2 shadow-md shadow-green-600/30">
           <CheckCircle2 className="w-6 h-6" />
         </div>
@@ -30,7 +30,7 @@ export function VotingStatusCard({ type, selectedName, questionNumber }: VotingS
 
   if (type === 'time-over') {
     return (
-      <Card className="w-full p-5 rounded-3xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-900/50 flex flex-col items-center text-center my-auto">
+      <Card className="w-full p-5 rounded-3xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-900/50 flex flex-col items-center text-center my-auto shrink-0">
         <Clock className="w-10 h-10 text-amber-500 mb-2 animate-bounce" />
         <span className="text-xs text-amber-700 dark:text-amber-300 font-bold uppercase">
           ĐÃ HẾT THỜI GIAN
@@ -43,7 +43,7 @@ export function VotingStatusCard({ type, selectedName, questionNumber }: VotingS
   }
 
   return (
-    <Card className="w-full p-5 rounded-3xl bg-zinc-100 dark:bg-zinc-800/80 border border-zinc-200 dark:border-zinc-700 flex flex-col items-center text-center my-auto">
+    <Card className="w-full p-5 rounded-3xl bg-zinc-100 dark:bg-zinc-800/80 border border-zinc-200 dark:border-zinc-700 flex flex-col items-center text-center my-auto shrink-0">
       <Lock className="w-9 h-9 text-zinc-400 mb-2" />
       <span className="text-xs text-zinc-500 dark:text-zinc-400 font-bold uppercase">
         CHỜ MỞ CỔNG BÌNH CHỌN

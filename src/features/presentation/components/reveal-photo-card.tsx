@@ -20,12 +20,12 @@ export function RevealPhotoCard({
 }: RevealPhotoCardProps) {
   return (
     <div className="lg:col-span-5 flex flex-col items-center">
-      <div className="relative w-full max-w-sm aspect-square rounded-3xl overflow-hidden shadow-2xl border-4 border-zinc-800 bg-zinc-900 group">
+      <div className="relative w-full max-w-md h-[400px] rounded-3xl overflow-hidden shadow-2xl border-4 border-zinc-800 bg-zinc-950 flex items-center justify-center p-3 group">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={photoUrl}
           alt="Ảnh thử thách"
-          className={`w-full h-full object-cover select-none transition-all duration-500 ${
+          className={`max-w-full max-h-full w-auto h-auto object-contain select-none transition-all duration-500 rounded-2xl ${
             !revealedFemale ? 'brightness-95 contrast-105' : 'brightness-100'
           }`}
         />

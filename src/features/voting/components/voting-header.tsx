@@ -24,18 +24,16 @@ export function VotingHeader({
   onLogout,
 }: VotingHeaderProps) {
   return (
-    <div className="flex flex-col gap-2.5 pb-2">
+    <div className="w-full flex flex-col gap-2 pb-2 shrink-0">
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <Badge variant="primary" className="px-3 py-1 text-xs shadow-md shadow-red-600/30">
+        {/* Nhãn câu hỏi độc lập */}
+        <div className="flex items-center">
+          <Badge variant="primary" className="px-3 py-1 text-xs font-headline font-black shadow-md shadow-red-600/30">
             CÂU {currentQuestionNumber} / {totalQuestions}
           </Badge>
-          <span className="text-xs font-bold text-zinc-700 dark:text-zinc-300 truncate max-w-[130px]">
-            {playerName}
-          </span>
         </div>
 
-        {/* Live Countdown Timer Badge */}
+        {/* Trạng thái đếm ngược & Thông tin người chơi đăng nhập */}
         <div className="flex items-center gap-2">
           {isQuestionVoting ? (
             <div className="flex items-center gap-1 px-3 py-1 rounded-full bg-red-100 dark:bg-red-950/80 border border-red-300 dark:border-red-800 text-[#DC2626] dark:text-red-400 font-headline font-black text-xs animate-pulse">
@@ -53,6 +51,16 @@ export function VotingHeader({
               <span>Chờ bắt đầu</span>
             </div>
           )}
+
+          {/* Badge nhận diện người chơi (Tránh nhầm với đáp án câu hỏi) */}
+          <div className="flex items-center gap-1.5 pl-1.5 pr-2 py-0.5 rounded-full bg-zinc-800/90 border border-zinc-700 text-zinc-300 max-w-[120px] shadow-sm" title={`Tài khoản đang đăng nhập: ${playerName}`}>
+            <div className="w-4 h-4 rounded-full bg-red-600 text-white flex items-center justify-center text-[9px] font-bold flex-shrink-0">
+              {playerName[0] || 'U'}
+            </div>
+            <span className="truncate text-[11px] font-medium text-zinc-200">
+              {playerName}
+            </span>
+          </div>
 
           <button
             type="button"

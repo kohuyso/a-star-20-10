@@ -24,7 +24,7 @@ export function QuestionPhotoCard({
   hasAnswered = false,
 }: QuestionPhotoCardProps) {
   return (
-    <div className="flex flex-col gap-3">
+    <div className="w-full flex flex-col gap-2.5 shrink-0">
       {/* Tactical Portrait with L-shaped red corners & Mystery Grid */}
       <TacticalPortrait
         src={photoUrl}
@@ -36,7 +36,7 @@ export function QuestionPhotoCard({
         timerDurationSec={timerDurationSec}
         timerStartedAt={timerStartedAt}
         forceRevealAll={false}
-        className="shadow-lg border-2 border-white dark:border-zinc-800"
+        className="w-full shadow-lg border-2 border-white dark:border-zinc-800"
       />
 
       {/* Hint if available */}

@@ -57,7 +57,18 @@
       - `card.tsx`: Thiết lập nền thẻ mặc định thành `bg-[#161B26]` với viền `border-[#27303F]` và chữ `text-[#F8FAFC]`.
       - Toàn bộ các component Admin (`LiveBroadcasterCard`, `RosterMetricsGrid`, `RosterPlayerTable`, `AdminHeader`, `LanQrModal`): Đồng bộ phong cách Dark Arena, nhãn `text-zinc-400`, tiêu đề `text-white`, nút bấm và badge trạng thái tương phản sắc nét tuyệt đối.
       - Màn chiếu máy chiếu (`/slideshow`, `/results`), `/login`, `/vote`: Đồng bộ 100% theme Crimson Arena nguyên bản.
-    - Kiểm tra typecheck và unit test: `yarn tsc --noEmit` **0 errors**, `yarn vitest run` **5/5 tests passed (100%)**.
+- **2026-10-16**:
+  - **Tải và tích hợp 14 ảnh chính thức từ Google Drive (`1GlCpSyEEJtaR-j9COZClXXy2vmEOh2DD`)**:
+    - Tải toàn bộ 14 ảnh từ thư mục Google Drive của ban tổ chức về `public/images/female/`.
+    - Chuẩn hóa định dạng và đặt tên có số thứ tự câu hỏi: `01-nguyen-thi-nhat-anh.png` $\rightarrow$ `14-dang-quynh-chi.png`.
+    - Ghép nối chuẩn xác 100% 14 bạn nữ theo đúng thứ tự file vào bảng `FemaleProfile` và `Question` (Câu 1 đến Câu 14) tương ứng với tài khoản người dùng `User` trong database.
+    - Cập nhật script `prisma/seed.ts` và chạy nạp dữ liệu vào SQLite.
+    - Sửa giới tính tài khoản `00021` (Bùi Hồng Nhật) thành Nam (MALE).
+    - **Khắc phục triệt để lỗi ảnh bị cắt (Dynamic Aspect Ratio Box)**: Thay vì chỉ dùng CSS `object-contain` tĩnh (vốn bị lỗi cyclic height trong flexbox khiến ảnh dài bị bung kích thước tự nhiên và bị `overflow-hidden` cắt mất đầu/chân), đã nâng cấp `MysteryGridImage` tự động đọc `naturalWidth` / `naturalHeight` từ ảnh gốc để thiết lập thuộc tính CSS `aspectRatio` chính xác cho khung chứa. Nhờ đó, cả trên máy chiếu (`/slideshow`) lẫn điện thoại (`/vote`), ảnh dọc (9:16, 9:20), ảnh vuông (1:1) hay ảnh ngang đều hiển thị trọn vẹn 100% từ đầu đến chân, lưới 25 ô che phủ vừa khít từng pixel của bức ảnh và không bị cắt xén bất kỳ chi tiết nào.
+    - **Tối ưu padding 2 bên trên màn hình điện thoại (Mobile-First Polish)**: Giảm padding ngang của màn hình vote (`/vote`), màn chờ (`LobbyWaitingCard`, `RevealWaitingCard`), khung chân dung (`TacticalPortrait`) và màn đăng nhập (`/login`) từ `px-4`/`p-6` xuống `px-2.5 sm:px-4`/`p-4 sm:p-6`, giúp nội dung bung rộng tối đa trên màn hình hẹp, loại bỏ khoảng trống đen thừa 2 bên mép điện thoại.
+    - Toàn bộ kiểm thử: `yarn tsc --noEmit` **0 errors**, `yarn vitest run` **13/13 tests passed (100%)**, `yarn build` **Compiled successfully in 1.4s**.
+
+
   - **Sửa lỗi chọn thời gian đếm ngược bị nhảy về 20s (`/admin`)**:
     - **Nguyên nhân cốt lõi**: Hàm `fetchAdminData()` polling mỗi 1000ms gọi `setSelectedDuration(stateData.gameState.timerDurationSec)`. Khi Admin nhấn chọn nút 30s trên giao diện, giá trị chỉ cập nhật vào local state mà chưa kịp lưu vào DB (hoặc trước khi DB lưu), khiến nhịp poll tiếp theo (sau 1s) đọc lại giá trị cũ từ DB (20s) và ghi đè ngược lại làm nút nhảy từ 30s về 20s.
     - **Giải pháp**:
@@ -98,4 +109,65 @@
       - Tái dựng dòng chữ 2 dòng với font Google `Dancing Script` (SemiBold 600, tone màu đỏ rượu vang `#460C10` hài hòa với màu đỏ Crimson Arena).
       - Đăng ký Google font `Dancing_Script` vào `src/app/layout.tsx` (`--font-dancing-script`) và `src/app/globals.css` (`.font-script`).
       - Typecheck `yarn tsc --noEmit` và unit test `yarn vitest run` 12/12 pass.
-
+- **2026-10-13**:
+  - **Cập nhật danh sách 57 người chơi chính thức & Mật khẩu**:
+    - Nhập danh sách 57 thành viên công ty: Cột trái là mật khẩu (mã định danh `B01`..`B04`, `00001`..`00062`, `PT0029`..`PT0039`, `INT0035`..`INT0097`), cột phải là tài khoản / họ và tên.
+    - Bổ sung trường `gender: String @default("MALE")` vào model `User` trong SQLite schema (`prisma/schema.prisma`).
+    - Phân định chuẩn xác giới tính: 42 nam và 15 nữ (bao gồm bạn Bùi Hồng Nhật, Chu Yến Nhi, v.v.).
+    - Tích hợp tính năng đổi giới tính 1-click trực tiếp trên bảng quản trị `/admin` (`POST /api/admin/player/gender`).
+    - Seed toàn bộ vào cơ sở dữ liệu (`prisma/seed.ts`), mã hóa mật khẩu bcrypt theo mã code và dọn sạch các tài khoản test mock cũ.
+  - **Ẩn gợi ý tài khoản ở màn hình Đăng nhập (`/login`)**:
+    - Loại bỏ thẻ gợi ý `PlayerQuickSelect` và các ví dụ hardcode (`nguyen.nam`, `15/03`).
+    - Cập nhật nhãn và placeholder trong `LoginForm`: "TÀI KHOẢN / HỌ VÀ TÊN" và "MẬT KHẨU".
+    - Khởi tạo input rỗng an toàn, tránh lộ tài khoản người chơi khác.
+    - Tối ưu hàm `authenticateUser` trong `src/lib/auth.ts`: Cho phép đăng nhập linh hoạt bằng họ tên có dấu, không dấu, chữ thường, hoặc mã nhân viên; xử lý trường hợp trùng tên (ví dụ: 2 người tên *Phạm Minh Tuấn* ứng với 2 mật khẩu khác nhau `00030` và `INT0097`).
+  - **Quy tắc Trao quà chỉ dành cho Nam (Epic D4)**:
+    - Cập nhật thuật toán `calculateRevealRounds` trong `src/lib/game-engine.ts`: Người chơi nữ vẫn tham gia dự đoán bình thường, thống kê lượt đoán và hiển thị trong danh sách người chơi; tuy nhiên khi chọn người trao quà cho bạn nữ (`selectedWinner`), bộ lọc loại trừ tuyệt đối tài khoản nữ (`user?.gender === 'FEMALE'`), chỉ chọn người chơi nam nhanh nhất.
+    - Bổ sung unit test kiểm chứng quy tắc này trong `src/lib/game-engine.test.ts`.
+- **2026-10-16**:
+  - **Chuẩn hóa 14 ảnh chính thức từ Google Drive & Đổi thứ tự câu 7 và 13**:
+    - Tải và ánh xạ 14 ảnh bạn nữ chất lượng cao về thư mục nội bộ `public/images/female/`.
+    - Cập nhật hạt giống DB `prisma/seed.ts` theo đúng danh sách nhân sự thực tế, đổi chỗ Câu 7 (Lê Khánh Linh) và Câu 13 (Phạm Thị Ánh Tuyết), gán Bùi Hồng Nhật là Nam (`00021`).
+    - Sắp xếp ngẫu nhiên/alphabetical danh sách ứng viên nữ trong `api/vote/progress/route.ts` để thứ tự trong danh sách chọn không làm lộ đáp án câu hỏi.
+    - Xóa tên đáp án bị lộ trong gợi ý (hint) câu 13.
+  - **Tách biệt thông tin người chơi và câu hỏi ở Header trang `/vote`**:
+    - Đưa thông tin tài khoản đang đăng nhập (`playerName`) vào badge user profile riêng biệt với avatar chữ cái đầu ở góc phải, hoàn toàn tách rời khỏi badge `CÂU X / Y` ở góc trái.
+  - **Khắc phục lỗi layout nhảy padding khi bấm bắt đầu đếm ngược (`/vote`)**:
+    - **Nguyên nhân cốt lõi**:
+      1. Trong `MysteryGridImage`, thẻ wrapper có `aspectRatio: naturalWidth / naturalHeight` khiến khi ảnh load xong hoặc bắt đầu đếm ngược, chiều rộng khung ảnh bị co cụm lại theo tỉ lệ dọc của ảnh, để lại khoảng trống màu đen lớn 2 bên khiến trông như padding tự to ra.
+      2. Trong `TacticalPortrait` và `QuestionPhotoCard`, thiếu thuộc tính `shrink-0` (hoặc `flex-shrink-0`). Khi Admin bấm bắt đầu đếm ngược, component `CandidateSelector` và `VotingActionDeck` xuất hiện, flexbox tự động nén chiều cao của ảnh lại. Do ảnh có `aspect-[4/5]`, khi chiều cao bị nén, chiều rộng của ảnh cũng bị nén theo, khiến ảnh thu hẹp lại giữa màn hình và tạo ra khoảng cách lề (khoảng trống giả lập padding) đột ngột phình to.
+    - **Khắc phục triệt để**:
+      1. Sửa lỗi `mx-auto` thiếu `w-full` trên toàn bộ cây DOM (`vote/page.tsx`, `CandidateSelector`, `VotingActionDeck`, `VotingHeader`, `QuestionPhotoCard`, `LobbyWaitingCard`, `RevealWaitingCard`): Trong CSS Flexbox, khi một phần tử con có `mx-auto` mà không có `w-full`, trình duyệt hủy thuộc tính `align-items: stretch` và thu hẹp toàn bộ layout về `fit-content`. Khi bước vào giai đoạn đếm ngược, việc hoán đổi các component khiến toàn bộ trang co lại thành một cột hẹp ở giữa. Việc bổ sung `w-full` và `shrink-0` khóa cứng độ rộng toàn bộ layout 100% không bao giờ bị co lại.
+      2. Bỏ giới hạn hẹp `max-w-[340px]` trên `TacticalPortrait` $\rightarrow$ Đặt `w-full` đồng bộ 100% với `CandidateSelector`, `VotingHeader` và `VotingActionDeck`. Mọi thành phần trên trang đều căn thẳng hàng với cùng padding 10px ở 2 bên mép màn hình.
+      3. Tích hợp lớp nền Ambient Blurred Backdrop trong `MysteryGridImage`: Bên dưới ảnh gốc `object-contain`, bổ sung lớp ảnh mờ ảo `object-cover blur-2xl scale-125 opacity-35` lấp đầy 100% khung card từ góc này sang góc kia. Xóa bỏ hoàn toàn khoảng đen trống (khoảng hụt lề 2 bên) khi hiển thị các ảnh dọc tỉ lệ 9:16/3:4.
+      4. Ảnh chính giữa giữ nguyên 100% chi tiết gốc không bao giờ bị cắt xén, đồng thời toàn khung card luôn lấp đầy màu sắc hài hòa đồng điệu.
+  - **Tạo Trang Ẩn Đăng Ký Tài Khoản (/secret-register)**:
+    - **Yêu cầu**: Xây dựng một trang bí mật để thêm tài khoản người chơi/admin tùy ý, hoàn toàn không hiển thị nút bấm hay đường link nào trên giao diện (chỉ truy cập bằng URL trực tiếp).
+    - **Thực hiện**:
+      1. Tạo Route Handler bí mật `src/app/api/secret/users/route.ts` hỗ trợ:
+         - `GET`: Lấy danh sách toàn bộ tài khoản trong SQLite, số lượt votes, lọc theo Nam/Nữ/Admin/Player và tìm kiếm theo tên.
+         - `POST`: Nhận thông tin họ tên, mã tài khoản, mật khẩu, giới tính (Nam/Nữ) và vai trò (Player/Admin); kiểm tra trùng lặp và mã hóa mật khẩu bằng `bcryptjs`; trả về tài khoản và token đăng nhập sẵn.
+         - `DELETE`: Cho phép xóa nhanh các tài khoản thử nghiệm phát sinh (bảo vệ không xóa tài khoản admin gốc).
+      2. Tạo giao diện trang ẩn `src/app/secret-register/page.tsx`:
+         - Chủ đề Dark Crimson Arena (#0F1218, viền #27303F, màu nhấn #DC2626 & #F59E0B).
+         - Form tạo tài khoản đầy đủ: Họ tên, Tên đăng nhập (kèm nút "Tự sinh mã"), Mật khẩu (kèm nút "Đặt trùng mã" & hiện/ẩn), Chọn Giới tính (Nam tặng quà / Nữ dự đoán), Chọn Vai trò (Player / Admin).
+         - Card thông báo thành công kèm nút Sao chép thông tin tài khoản và nút Đăng nhập nhanh.
+         - Bảng danh sách trực tiếp các tài khoản trong hệ thống kèm số liệu đếm (Tổng, Nam, Nữ, Admin), ô tìm kiếm và lọc tức thì.
+      3. Hoàn toàn KHÔNG xuất hiện trên thanh điều hướng, footer, login hay bất kỳ trang nào khác. Chỉ truy cập khi gõ URL: `/secret-register`.
+      4. Kiểm tra chất lượng: `yarn tsc --noEmit` 0 lỗi, `yarn vitest run` 13/13 tests passed.
+  - **Khắc phục triệt để lỗi hình ảnh bị nháy lộ mặt khi Admin bắt đầu cho đoán**:
+    - **Nguyên nhân cốt lõi**:
+      1. Trong `src/app/(player)/vote/page.tsx` và `src/app/(presentation)/slideshow/page.tsx`, state `timeLeft` được khởi tạo là `0` (`useState(0)`). Khi Admin bấm "Bắt đầu đếm ngược", `data.isQuestionActive` chuyển sang `true`, nhưng `useEffect` tính `tick()` chỉ chạy sau khi lượt render đầu tiên hoàn thành. Do đó trong frame đầu tiên, `timeLeft` vẫn bằng `0`.
+      2. Trong [MysteryGridImage](file:///Users/Astar/Node/astar_20_10/src/components/shared/mystery-grid-image.tsx), code cũ có điều kiện `if (timeLeft <= 10) return new Set(revealOrder);`. Do `timeLeft = 0` (0 <= 10), component hiểu nhầm là đã hết giờ hoặc đã đến 10s cuối, lập tức mở 100% toàn bộ 25 ô gạch che và bật `opacity-100` cho ảnh gốc.
+      3. Sau 1 tick (khoảng 10-50ms), `useEffect` chạy xong và set `timeLeft = 20`, component re-render lại và đóng 25 ô gạch lại. Khoảng thời gian chớp nhoáng đó khiến toàn bộ ảnh bạn nữ bị nháy sáng và lộ rõ mồn một.
+    - **Giải pháp xử lý triệt để**:
+      1. **Bảo vệ chống nháy lộ ảnh trong `MysteryGridImage`**:
+         - Tính toán `elapsed` thực tế trực tiếp từ `timerStartedAt`: `const elapsed = Math.max(0, Math.floor((Date.now() - startMs) / 1000));`.
+         - Bổ sung chốt an toàn: Khi phiên vừa bắt đầu (`elapsed <= 0` và `timeLeft <= 0`), **tuyệt đối mở 0 ô (che kín 100%)**.
+         - Điều kiện mở 100% trong 10s cuối bắt buộc phải thỏa mãn đồng thời: `effectiveRemaining <= 10` VÀ `elapsed >= Math.max(0, duration - 10)` (đảm bảo thời gian thực tế đã thực sự trôi qua tới 10s cuối, chứ không phải do bug `timeLeft = 0` lúc khởi tạo).
+      2. **Tính thời gian tức thì đồng bộ trong `vote/page.tsx` & `slideshow/page.tsx`**:
+         - Bổ sung hàm `calculateRealRemaining()` tính trực tiếp thời gian còn lại từ `timerStartedAt` và `timerDurationSec` ngay trong render cycle đầu tiên.
+         - Loại bỏ hoàn toàn độ trễ 1 render cycle của `useState(0)`, ngăn chặn giật giao diện từ "Hết giờ" sang "Chọn ứng viên".
+      3. **Unit Tests & QA Verification**:
+         - Bổ sung test case kiểm chứng chống nháy lộ ảnh trong `src/components/shared/mystery-grid-image.test.ts`.
+         - Kết quả: `yarn vitest run` 14/14 tests pass, `yarn tsc --noEmit` 0 errors. Đã kiểm tra trực tiếp qua browser subagent.

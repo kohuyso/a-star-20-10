@@ -28,7 +28,7 @@ export function TacticalPortrait({
 }: TacticalPortraitProps) {
   return (
     <div
-      className={`relative w-full max-w-[340px] mx-auto aspect-[4/5] rounded-[20px] bg-zinc-900 shadow-md overflow-hidden p-2 flex flex-col justify-end ${className}`}
+      className={`relative w-full mx-auto aspect-[4/5] rounded-[20px] bg-zinc-900 shadow-md overflow-hidden p-1.5 sm:p-2 flex flex-col justify-end shrink-0 ${className}`}
     >
       {/* 4 Góc L-shaped đỏ nhận diện thương hiệu Crimson Arena */}
       <svg
@@ -73,7 +73,7 @@ export function TacticalPortrait({
       </svg>
 
       {/* Ảnh chân dung (hoặc Mystery Grid nếu có questionNumber) */}
-      <div className="w-full h-full rounded-[16px] overflow-hidden">
+      <div className="w-full h-full rounded-[16px] overflow-hidden flex items-center justify-center bg-zinc-950">
         {questionNumber !== undefined ? (
           <MysteryGridImage
             src={src}
@@ -90,7 +90,7 @@ export function TacticalPortrait({
           />
         ) : (
           /* eslint-disable-next-line @next/next/no-img-element */
-          <img src={src} alt={alt} className="w-full h-full object-cover rounded-[16px]" />
+          <img src={src} alt={alt} className="max-w-full max-h-full w-auto h-auto object-contain rounded-[16px]" />
         )}
       </div>
 

@@ -51,7 +51,7 @@ export function MysteryGridImage({
     return seededShuffle(indices, questionNumber * 7919 + 101);
   }, [totalTiles, questionNumber]);
 
-  // 2. Tính số lượng ô được mở (revealedCount)
+  // 2. Tính số lượng ô được mở (revealedTilesSet)
   // Quy tắc: Hoàn thành mở 100% trước 10s so với thời gian kết thúc phiên đoán.
   const revealedTilesSet = useMemo(() => {
     // 1. Nếu bắt buộc mở toàn bộ (ví dụ màn trao giải /results)
@@ -67,30 +67,47 @@ export function MysteryGridImage({
 
     const duration = Math.max(1, timerDurationSec || 20);
     const revealTargetDuration = Math.max(1, duration - 10);
-
-    // 3. Nếu phiên đang KHÔNG active (Admin chưa bấm bắt đầu hoặc đã bấm khóa):
-    if (!isQuestionActive) {
-      // Kiểm tra xem phiên này đã từng đếm ngược xong hết giờ hay chưa
-      const startMs = new Date(timerStartedAt).getTime();
-      const elapsed = Math.floor((Date.now() - startMs) / 1000);
-
-      // Chỉ giữ nguyên trạng thái mở nếu phiên này đã thực sự đếm ngược kết thúc
-      if (elapsed >= duration) {
-        return new Set(revealOrder);
-      }
-      // Ngược lại: che kín 100%
+    const startMs = new Date(timerStartedAt).getTime();
+    if (isNaN(startMs)) {
       return new Set<number>();
     }
 
-    // 4. Khi phiên ĐANG ACTIVE ĐẾM NGƯỢC (isQuestionActive === true):
-    // Trong 10s cuối (timeLeft <= 10) hoặc hết giờ (timeLeft === 0):
-    if (timeLeft <= 10) {
+    const elapsed = Math.max(0, Math.floor((Date.now() - startMs) / 1000));
+
+    // 3. Nếu phiên đang KHÔNG active (Admin chưa bấm bắt đầu hoặc đã bấm khóa):
+    if (!isQuestionActive) {
+      // Chỉ giữ nguyên trạng thái mở nếu phiên này đã thực sự đếm ngược kết thúc (đã trôi qua >= duration)
+      if (elapsed >= duration) {
+        return new Set(revealOrder);
+      }
+      // Ngược lại (chưa bắt đầu hoặc chưa chạy xong): TUYỆT ĐỐI CHE KÍN 100%
+      return new Set<number>();
+    }
+
+    // 4. KHI PHIÊN ĐANG ACTIVE ĐẾM NGƯỢC (isQuestionActive === true):
+    // CHỐNG NHÁY LỘ ẢNH (Anti-flicker protection):
+    // Khi phiên vừa bắt đầu (elapsed <= 0 giây):
+    // Tuyệt đối không mở ô nào, ngay cả khi timeLeft truyền vào bị trễ/bằng 0 do re-render!
+    if (elapsed <= 0 && timeLeft <= 0) {
+      return new Set<number>();
+    }
+
+    // Tính thời gian còn lại chuẩn xác
+    const effectiveRemaining = timeLeft > 0 ? timeLeft : Math.max(0, duration - elapsed);
+
+    // BẢO VỆ CHẶT CHẼ:
+    // Chỉ mở 100% các ô khi ĐÃ THỰC SỰ TRÔI QUA ĐẾN 10S CUỐI CÙNG hoặc ĐÃ HẾT GIỜ THẬT SỰ:
+    if (effectiveRemaining <= 10 && elapsed >= Math.max(0, duration - 10)) {
+      return new Set(revealOrder);
+    }
+
+    if (elapsed >= duration) {
       return new Set(revealOrder);
     }
 
     // Khi còn > 10s: mở dần dần ngẫu nhiên từ lúc bắt đầu cho tới mốc 10s cuối:
-    const elapsed = Math.max(0, duration - timeLeft);
-    const progressRatio = Math.min(1, Math.max(0, elapsed / revealTargetDuration));
+    const effectiveElapsed = Math.max(0, duration - effectiveRemaining);
+    const progressRatio = Math.min(1, Math.max(0, effectiveElapsed / revealTargetDuration));
     const revealedCount = Math.floor(progressRatio * totalTiles);
 
     const revealed = new Set<number>();
@@ -109,20 +126,31 @@ export function MysteryGridImage({
   ]);
 
   return (
-    <div className={`relative w-full h-full overflow-hidden select-none bg-[#12161F] ${className}`}>
-      {/* 1. Ảnh gốc bên dưới (ẩn opacity-0 khi chưa mở ô nào để chống lộ ảnh trước) */}
+    <div className={`relative w-full h-full flex items-center justify-center overflow-hidden select-none bg-[#0B0E14] ${className}`}>
+      {/* 1. Lớp nền ambient mờ ảo từ chính bức ảnh: Lấp đầy 100% khung card, xóa sạch hoàn toàn khoảng đen 2 bên (padding giả lập) */}
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src={src}
+        alt=""
+        aria-hidden="true"
+        className={`absolute inset-0 w-full h-full object-cover blur-2xl scale-125 opacity-35 transition-opacity duration-500 pointer-events-none select-none ${
+          revealedTilesSet.size === 0 ? 'opacity-0' : 'opacity-35'
+        }`}
+      />
+
+      {/* 2. Ảnh gốc chính giữa (object-contain giữ trọn 100% chi tiết, không bao giờ bị cắt xén) */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src={src}
         alt={alt}
-        className={`w-full h-full object-cover transition-opacity duration-300 ${
+        className={`relative z-10 w-full h-full object-contain transition-opacity duration-300 block select-none drop-shadow-2xl ${
           revealedTilesSet.size === 0 ? 'opacity-0' : 'opacity-100'
         } ${imageClassName}`}
       />
 
-      {/* 2. Lớp phủ lưới ô vuông (Mystery Grid Overlay) */}
+      {/* 3. Lớp phủ lưới ô vuông (Mystery Grid Overlay) - phủ trọn vẹn 100% diện tích card đồng nhất */}
       <div
-        className="absolute inset-0 grid pointer-events-none"
+        className="absolute inset-0 grid pointer-events-none z-20"
         style={{
           gridTemplateColumns: `repeat(${gridSize}, minmax(0, 1fr))`,
           gridTemplateRows: `repeat(${gridSize}, minmax(0, 1fr))`,

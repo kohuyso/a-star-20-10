@@ -9,6 +9,7 @@ export interface SessionUser {
   username: string;
   fullName: string;
   role: 'PLAYER' | 'ADMIN';
+  gender?: 'MALE' | 'FEMALE';
 }
 
 /**
@@ -49,49 +50,78 @@ function getDobCandidates(input: string): string[] {
   return Array.from(candidates);
 }
 
+function stripVietnameseAccents(str: string): string {
+  return str
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/đ/g, 'd')
+    .replace(/Đ/g, 'D')
+    .toLowerCase()
+    .trim()
+    .replace(/\s+/g, ' ');
+}
+
 /**
  * Đăng nhập và xác thực tài khoản
  */
 export async function authenticateUser(usernameInput: string, passwordInput: string): Promise<SessionUser | null> {
-  const cleanUsername = usernameInput.trim().toLowerCase();
+  const rawInput = usernameInput.trim();
+  const cleanUsername = rawInput.toLowerCase();
+  const noAccentsInput = stripVietnameseAccents(rawInput);
   const usernameWithoutDot = cleanUsername.replace(/\./g, ' ');
   const usernameWithoutSpace = cleanUsername.replace(/\s+/g, '.');
 
   // Lấy toàn bộ users
   const users = await prisma.user.findMany();
   
-  const user = users.find((u) => {
+  // Lọc tất cả các user tiềm năng khớp với tên / tài khoản / mã nhân viên
+  const candidateUsers = users.filter((u) => {
     const uName = u.username.toLowerCase();
     const fName = u.fullName.toLowerCase();
+    const fNameNoAccents = stripVietnameseAccents(u.fullName);
+
     return (
       uName === cleanUsername ||
       uName === usernameWithoutDot ||
       uName === usernameWithoutSpace ||
       fName === cleanUsername ||
-      fName.includes(cleanUsername)
+      fNameNoAccents === noAccentsInput ||
+      fName.includes(cleanUsername) ||
+      fNameNoAccents.includes(noAccentsInput)
     );
   });
 
-  if (!user) {
+  if (candidateUsers.length === 0) {
     return null;
   }
 
-  // Danh sách các biến thể mật khẩu có thể xảy ra
-  const passwordCandidates = getDobCandidates(passwordInput);
+  // Danh sách các biến thể mật khẩu có thể xảy ra (mã code, chữ hoa, chữ thường, ngày sinh)
+  const rawPassword = passwordInput.trim();
+  const passwordCandidates = Array.from(
+    new Set([
+      rawPassword,
+      rawPassword.toUpperCase(),
+      rawPassword.toLowerCase(),
+      ...getDobCandidates(rawPassword),
+    ])
+  );
 
-  for (const candidate of passwordCandidates) {
-    try {
-      const isMatch = await bcrypt.compare(candidate, user.passwordHash);
-      if (isMatch) {
-        return {
-          id: user.id,
-          username: user.username,
-          fullName: user.fullName,
-          role: user.role as 'PLAYER' | 'ADMIN',
-        };
+  for (const user of candidateUsers) {
+    for (const candidate of passwordCandidates) {
+      try {
+        const isMatch = await bcrypt.compare(candidate, user.passwordHash);
+        if (isMatch) {
+          return {
+            id: user.id,
+            username: user.username,
+            fullName: user.fullName,
+            role: user.role as 'PLAYER' | 'ADMIN',
+            gender: (user.gender as 'MALE' | 'FEMALE') || 'MALE',
+          };
+        }
+      } catch {
+        // bỏ qua lỗi compare nếu candidate không hợp lệ
       }
-    } catch {
-      // bỏ qua lỗi compare nếu candidate không hợp lệ
     }
   }
 
@@ -124,6 +154,7 @@ export function decodeSession(token: string): SessionUser | null {
       username: data.username,
       fullName: data.fullName,
       role: data.role,
+      gender: data.gender || 'MALE',
     };
   } catch {
     return null;
@@ -166,3 +197,4 @@ export async function getCurrentUser(): Promise<SessionUser | null> {
 
   return null;
 }
+

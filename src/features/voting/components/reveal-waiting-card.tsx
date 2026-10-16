@@ -9,7 +9,7 @@ export interface RevealWaitingCardProps {
 
 export function RevealWaitingCard({ playerName, onLogout }: RevealWaitingCardProps) {
   return (
-    <div className="min-h-screen bg-[#0F1218] text-[#F8FAFC] flex flex-col justify-between items-center px-4 py-8 max-w-md mx-auto font-body">
+    <div className="w-full min-h-screen bg-[#0F1218] text-[#F8FAFC] flex flex-col justify-between items-center px-2.5 sm:px-4 py-6 sm:py-8 max-w-md mx-auto font-body">
       <div className="w-full flex items-center justify-between pb-4 border-b border-[#27303F]">
         <p className="text-xs font-bold text-white">{playerName}</p>
         <button
@@ -21,7 +21,7 @@ export function RevealWaitingCard({ playerName, onLogout }: RevealWaitingCardPro
         </button>
       </div>
 
-      <Card className="my-auto w-full flex flex-col items-center text-center py-8 px-6 rounded-3xl shadow-2xl border border-[#27303F]">
+      <Card className="my-auto w-full flex flex-col items-center text-center py-7 px-4 sm:px-6 rounded-3xl shadow-2xl border border-[#27303F]">
         <div className="w-18 h-18 rounded-full bg-gradient-to-tr from-amber-500 to-amber-300 text-zinc-950 flex items-center justify-center shadow-lg shadow-amber-500/30 mb-4 animate-bounce">
           <Trophy className="w-9 h-9" />
         </div>

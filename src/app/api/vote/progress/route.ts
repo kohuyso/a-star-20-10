@@ -72,10 +72,10 @@ export async function GET() {
     const previouslySelectedNamesNorm = otherVotes.map((v: any) => normalizeVietnamese(v.selectedName));
     const selectedNames = userVotes.map((v: any) => v.selectedName);
 
-    // Danh sách tên còn lại mà user ĐƯỢC PHÉP chọn cho câu này
-    const remainingFemaleNames = allFemaleNames.filter(
-      (name: string) => !previouslySelectedNamesNorm.includes(normalizeVietnamese(name))
-    );
+    // Danh sách tên còn lại mà user ĐƯỢC PHÉP chọn cho câu này (sắp xếp A-Z để không lộ đáp án)
+    const remainingFemaleNames = allFemaleNames
+      .filter((name: string) => !previouslySelectedNamesNorm.includes(normalizeVietnamese(name)))
+      .sort((a: string, b: string) => a.localeCompare(b, 'vi'));
 
     return NextResponse.json({
       gameState: gameState.status,

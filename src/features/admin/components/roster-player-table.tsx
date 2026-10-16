@@ -6,6 +6,7 @@ export interface PlayerRosterItem {
   id: string;
   username: string;
   fullName: string;
+  gender?: string;
   answersCount: number;
   totalQuestions: number;
   correctCount: number;
@@ -17,9 +18,10 @@ export interface PlayerRosterItem {
 export interface RosterPlayerTableProps {
   players: PlayerRosterItem[];
   onRefresh: () => void;
+  onToggleGender?: (userId: string, currentGender: string) => void;
 }
 
-export function RosterPlayerTable({ players, onRefresh }: RosterPlayerTableProps) {
+export function RosterPlayerTable({ players, onRefresh, onToggleGender }: RosterPlayerTableProps) {
   return (
     <Card className="rounded-3xl p-6 shadow-xl border border-[#27303F]">
       <div className="flex items-center justify-between pb-4 border-b border-[#27303F]">
@@ -28,7 +30,7 @@ export function RosterPlayerTable({ players, onRefresh }: RosterPlayerTableProps
             Danh Sách Tiến Độ Người Chơi ({players.length})
           </h3>
           <p className="text-xs text-zinc-400 mt-0.5">
-            Tự động cập nhật trực tiếp theo từng câu hỏi
+            Tự động cập nhật trực tiếp theo từng câu hỏi (nhấp vào giới tính để đổi Nam/Nữ)
           </p>
         </div>
         <button
@@ -46,7 +48,8 @@ export function RosterPlayerTable({ players, onRefresh }: RosterPlayerTableProps
           <thead>
             <tr className="border-b border-[#27303F] text-zinc-400 font-headline font-bold text-[11px] tracking-wider uppercase">
               <th className="pb-3 px-3">HỌ VÀ TÊN</th>
-              <th className="pb-3 px-3">TÀI KHOẢN</th>
+              <th className="pb-3 px-3">GIỚI TÍNH</th>
+              <th className="pb-3 px-3">MẬT KHẨU / MÃ</th>
               <th className="pb-3 px-3">SỐ CÂU ĐÃ TRẢ LỜI</th>
               <th className="pb-3 px-3">TRẠNG THÁI</th>
               <th className="pb-3 px-3">THỜI GIAN GẦN NHẤT</th>
@@ -57,6 +60,24 @@ export function RosterPlayerTable({ players, onRefresh }: RosterPlayerTableProps
               <tr key={player.id} className="hover:bg-zinc-800/40 transition-colors">
                 <td className="py-3 px-3 font-bold text-white">
                   {player.fullName}
+                </td>
+                <td className="py-3 px-3 font-medium">
+                  <button
+                    type="button"
+                    onClick={() => onToggleGender && onToggleGender(player.id, player.gender || 'MALE')}
+                    className="cursor-pointer transition-transform hover:scale-110 active:scale-95"
+                    title="Bấm để đổi Nam / Nữ"
+                  >
+                    {player.gender === 'FEMALE' ? (
+                      <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-pink-500/20 text-pink-300 border border-pink-500/40 hover:bg-pink-500/30">
+                        Nữ ♀
+                      </span>
+                    ) : (
+                      <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-blue-500/20 text-blue-300 border border-blue-500/40 hover:bg-blue-500/30">
+                        Nam ♂
+                      </span>
+                    )}
+                  </button>
                 </td>
                 <td className="py-3 px-3 text-zinc-400 font-medium">
                   @{player.username}

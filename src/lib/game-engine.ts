@@ -28,6 +28,7 @@ export interface UserInput {
   id: string;
   username: string;
   fullName: string;
+  gender?: string; // 'MALE' | 'FEMALE'
 }
 
 export interface RevealRoundResult {
@@ -124,8 +125,14 @@ export function calculateRevealRounds(params: {
       }))
       .sort((a, b) => a.answeredAtDate.getTime() - b.answeredAtDate.getTime());
 
-    // Các ứng viên chưa từng nhận/trao quà ở các câu trước
-    const eligibleVotes = questionVotes.filter((v) => !assignedUserIds.has(v.userId));
+    // Các ứng viên chưa từng nhận/trao quà ở các câu trước VÀ là NAM (người trao quà chỉ có thể là nam)
+    const eligibleVotes = questionVotes.filter((v) => {
+      if (assignedUserIds.has(v.userId)) return false;
+      const user = userMap.get(v.userId);
+      // Nữ có thể đoán nhưng người trao quà chỉ có thể là nam
+      if (user?.gender === 'FEMALE') return false;
+      return true;
+    });
 
     let selectedWinner: (typeof questionVotes)[0] | null = null;
     let reason: SelectionReason = 'MANUAL';

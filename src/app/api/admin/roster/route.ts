@@ -46,6 +46,7 @@ export async function GET() {
         id: player.id,
         username: player.username,
         fullName: player.fullName,
+        gender: player.gender,
         answersCount,
         totalQuestions,
         correctCount,

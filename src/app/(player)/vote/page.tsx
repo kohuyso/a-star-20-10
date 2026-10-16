@@ -105,7 +105,18 @@ export default function VotePage() {
     return () => clearInterval(interval);
   }, [loadProgress]);
 
-  // 2. Tính toán đếm ngược thời gian
+  // 2. Tính toán đếm ngược thời gian tức thì và đồng bộ
+  const calculateRealRemaining = useCallback(() => {
+    if (!data?.timerStartedAt || !data?.isQuestionActive) {
+      return 0;
+    }
+    const startMs = new Date(data.timerStartedAt).getTime();
+    if (isNaN(startMs)) return 0;
+    const duration = data.timerDurationSec || 20;
+    const elapsed = Math.floor((Date.now() - startMs) / 1000);
+    return Math.max(0, duration - elapsed);
+  }, [data?.timerStartedAt, data?.isQuestionActive, data?.timerDurationSec]);
+
   useEffect(() => {
     if (!data?.timerStartedAt || !data?.isQuestionActive) {
       setTimeLeft(0);
@@ -213,32 +224,38 @@ export default function VotePage() {
   const currentQ = data.currentQuestion;
   const currentQNum = data.currentQuestionNumber || 1;
   const hasAnsweredCurrent = !!data.userAnswerForCurrentQuestion;
-  const isQuestionVoting = data.isQuestionActive && timeLeft > 0;
-  const isTimeOver = data.isQuestionActive && timeLeft === 0;
+
+  // Thời gian còn lại chuẩn xác tức thì, loại bỏ 1 frame delay của useState
+  const currentRemaining = data.isQuestionActive
+    ? (timeLeft > 0 ? timeLeft : calculateRealRemaining())
+    : 0;
+
+  const isQuestionVoting = data.isQuestionActive && currentRemaining > 0;
+  const isTimeOver = data.isQuestionActive && currentRemaining === 0;
 
   return (
-    <div className="min-h-screen bg-[#0F1218] text-[#F8FAFC] flex flex-col justify-between px-4 py-4 max-w-md mx-auto font-body">
+    <div className="w-full min-h-screen bg-[#0F1218] text-[#F8FAFC] flex flex-col justify-between px-2.5 sm:px-4 py-3 sm:py-4 max-w-md mx-auto font-body">
       {/* 1. Header Bar Orchestrator */}
       <VotingHeader
         currentQuestionNumber={currentQNum}
         totalQuestions={data.totalQuestions}
         playerName={currentUser.fullName}
         isQuestionVoting={isQuestionVoting}
-        timeLeft={timeLeft}
+        timeLeft={currentRemaining}
         hasAnsweredCurrent={hasAnsweredCurrent}
         timerDurationSec={data.timerDurationSec}
         onLogout={handleLogout}
       />
 
       {/* 2. Photo & Candidate Selector Container */}
-      <div className="flex-1 flex flex-col gap-3 my-1 overflow-y-auto pb-2">
+      <div className="w-full flex-1 flex flex-col gap-3 my-1 overflow-y-auto pb-2">
         {currentQ && (
           <QuestionPhotoCard
             photoUrl={currentQ.photoUrl}
             questionNumber={currentQ.questionNumber}
             hint={currentQ.hint}
             isQuestionActive={data.isQuestionActive}
-            timeLeft={timeLeft}
+            timeLeft={currentRemaining}
             timerDurationSec={data.timerDurationSec}
             timerStartedAt={data.timerStartedAt}
             hasAnswered={hasAnsweredCurrent}

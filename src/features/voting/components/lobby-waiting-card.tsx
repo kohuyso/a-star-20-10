@@ -10,7 +10,7 @@ export interface LobbyWaitingCardProps {
 
 export function LobbyWaitingCard({ playerName, username, onLogout }: LobbyWaitingCardProps) {
   return (
-    <div className="min-h-screen bg-[#0F1218] text-[#F8FAFC] flex flex-col justify-between items-center px-4 py-8 max-w-md mx-auto font-body">
+    <div className="w-full min-h-screen bg-[#0F1218] text-[#F8FAFC] flex flex-col justify-between items-center px-2.5 sm:px-4 py-6 sm:py-8 max-w-md mx-auto font-body">
       {/* Top bar */}
       <div className="w-full flex items-center justify-between pb-4 border-b border-[#27303F]">
         <div className="flex items-center gap-2">
@@ -35,7 +35,7 @@ export function LobbyWaitingCard({ playerName, username, onLogout }: LobbyWaitin
       </div>
 
       {/* Waiting Card */}
-      <Card className="my-auto w-full flex flex-col items-center text-center py-8 px-6 rounded-3xl shadow-2xl border border-[#27303F]">
+      <Card className="my-auto w-full flex flex-col items-center text-center py-7 px-4 sm:px-6 rounded-3xl shadow-2xl border border-[#27303F]">
         <div className="relative w-20 h-20 mb-6 flex items-center justify-center">
           <div className="absolute inset-0 bg-amber-500/20 rounded-full animate-ping" />
           <div className="relative w-16 h-16 rounded-full bg-gradient-to-tr from-amber-500 to-amber-400 flex items-center justify-center shadow-lg text-white">

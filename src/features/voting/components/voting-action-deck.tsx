@@ -16,7 +16,7 @@ export function VotingActionDeck({
   onSubmit,
 }: VotingActionDeckProps) {
   return (
-    <div className="pt-2 border-t border-zinc-200 dark:border-zinc-800 flex flex-col gap-1.5">
+    <div className="w-full pt-2 border-t border-zinc-200 dark:border-zinc-800 flex flex-col gap-1.5 shrink-0">
       <Button
         variant="primary"
         size="lg"

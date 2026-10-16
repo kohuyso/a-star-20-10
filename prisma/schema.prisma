@@ -13,6 +13,7 @@ model User {
   passwordHash String
   fullName     String
   role         String        @default("PLAYER") // "PLAYER" | "ADMIN"
+  gender       String        @default("MALE") // "MALE" | "FEMALE"
   createdAt    DateTime      @default(now())
   votes        Vote[]
   wonRounds    RoundResult[]

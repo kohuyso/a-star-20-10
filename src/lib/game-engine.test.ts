@@ -130,4 +130,33 @@ describe('Epic D4: calculateRevealRounds', () => {
     expect(results[0].assignedUserId).toBeNull();
     expect(results[0].selectionReason).toBe('MANUAL');
   });
+
+  it('người trao quà chỉ có thể là nam: người chơi nữ đoán đúng nhanh nhất vẫn không được chọn trao quà', () => {
+    const mixedUsers: UserInput[] = [
+      { id: 'f_player', username: 'female1', fullName: 'Phạm Thị Nữ', gender: 'FEMALE' },
+      { id: 'm_player', username: 'male1', fullName: 'Trần Văn Nam', gender: 'MALE' },
+    ];
+
+    const votes: VoteInput[] = [
+      // f_player đoán đúng siêu nhanh (10:00:01)
+      { id: 'v1', userId: 'f_player', questionId: 'q1', selectedName: 'Nguyễn Thị A', isCorrect: true, answeredAt: '2026-10-09T10:00:01Z' },
+      // m_player đoán đúng sau (10:00:08)
+      { id: 'v2', userId: 'm_player', questionId: 'q1', selectedName: 'Nguyễn Thị A', isCorrect: true, answeredAt: '2026-10-09T10:00:08Z' },
+    ];
+
+    const results = calculateRevealRounds({
+      femaleProfiles: [mockFemales[0]],
+      questions: [mockQuestions[0]],
+      votes,
+      users: mixedUsers,
+    });
+
+    // Lượt vote của bạn nữ vẫn được thống kê và xuất hiện trong allVotes
+    expect(results[0].totalCorrectGuesses).toBe(2);
+    expect(results[0].allVotes.length).toBe(2);
+    // Nhưng người được chọn trao quà BẮT BUỘC phải là bạn nam (m_player)
+    expect(results[0].assignedUserId).toBe('m_player');
+    expect(results[0].assignedUserName).toBe('Trần Văn Nam');
+    expect(results[0].selectionReason).toBe('FASTEST_CORRECT');
+  });
 });
