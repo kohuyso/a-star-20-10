@@ -9,7 +9,7 @@ export interface SummaryRoundItem {
   assignedUserName: string | null;
   totalCorrectGuesses: number;
   totalGuesses: number;
-  selectionReason: 'FASTEST_CORRECT' | 'FASTEST_INCORRECT' | 'MANUAL' | 'NO_VOTES';
+  selectionReason: 'FASTEST_CORRECT' | 'FASTEST_INCORRECT' | 'LUCKY_FALLBACK' | 'MANUAL' | 'NO_VOTES';
 }
 
 export interface ResultsSummaryTableProps {
@@ -114,6 +114,7 @@ export function ResultsSummaryTable({ rounds, onSelectRound }: ResultsSummaryTab
                     <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-zinc-800 text-zinc-300">
                       {r.selectionReason === 'FASTEST_CORRECT' && '⚡ Đoán đúng nhanh nhất'}
                       {r.selectionReason === 'FASTEST_INCORRECT' && '🔥 Đoán sai dũng cảm nhất'}
+                      {r.selectionReason === 'LUCKY_FALLBACK' && '🎲 Chọn may mắn (chưa tặng)'}
                       {r.selectionReason === 'MANUAL' && '👑 MC chỉ định'}
                       {r.selectionReason === 'NO_VOTES' && '— Chưa vote'}
                     </span>

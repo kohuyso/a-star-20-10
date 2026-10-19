@@ -137,10 +137,11 @@ export default function VotePage() {
     return () => clearInterval(timer);
   }, [data?.timerStartedAt, data?.isQuestionActive, data?.timerDurationSec]);
 
-  // 3. Reset tên đang chọn khi chuyển câu mới
+  // 3. Reset tên đang chọn và bộ đếm ngược khi chuyển câu mới
   useEffect(() => {
     setSelectedName('');
     setErrorMessage('');
+    setTimeLeft(0);
   }, [data?.currentQuestionNumber]);
 
   // 4. Submit câu trả lời cho câu hiện tại
@@ -251,6 +252,7 @@ export default function VotePage() {
       <div className="w-full flex-1 flex flex-col gap-3 my-1 overflow-y-auto pb-2">
         {currentQ && (
           <QuestionPhotoCard
+            key={`question-card-${currentQ.questionNumber}`}
             photoUrl={currentQ.photoUrl}
             questionNumber={currentQ.questionNumber}
             hint={currentQ.hint}

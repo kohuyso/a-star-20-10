@@ -27,6 +27,7 @@ export function QuestionPhotoCard({
     <div className="w-full flex flex-col gap-2.5 shrink-0">
       {/* Tactical Portrait with L-shaped red corners & Mystery Grid */}
       <TacticalPortrait
+        key={`tactical-portrait-${questionNumber}`}
         src={photoUrl}
         alt={`Ảnh câu hỏi ${questionNumber}`}
         tagText={`ẢNH #${questionNumber}`}

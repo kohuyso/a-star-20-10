@@ -31,7 +31,7 @@ interface RevealRound {
   totalGuesses: number;
   assignedUserId: string | null;
   assignedUserName: string | null;
-  selectionReason: 'FASTEST_CORRECT' | 'FASTEST_INCORRECT' | 'MANUAL' | 'NO_VOTES';
+  selectionReason: 'FASTEST_CORRECT' | 'FASTEST_INCORRECT' | 'LUCKY_FALLBACK' | 'MANUAL' | 'NO_VOTES';
   answeredAt: string | null;
   allVotes: VoteDetail[];
 }

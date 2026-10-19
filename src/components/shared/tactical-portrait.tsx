@@ -76,6 +76,7 @@ export function TacticalPortrait({
       <div className="w-full h-full rounded-[16px] overflow-hidden flex items-center justify-center bg-zinc-950">
         {questionNumber !== undefined ? (
           <MysteryGridImage
+            key={`mystery-grid-${questionNumber}`}
             src={src}
             alt={alt}
             questionNumber={questionNumber}

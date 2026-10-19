@@ -1,4 +1,4 @@
-export type SelectionReason = 'FASTEST_CORRECT' | 'FASTEST_INCORRECT' | 'MANUAL' | 'NO_VOTES';
+export type SelectionReason = 'FASTEST_CORRECT' | 'FASTEST_INCORRECT' | 'LUCKY_FALLBACK' | 'MANUAL' | 'NO_VOTES';
 
 export interface FemaleProfileInput {
   id: string;
@@ -134,33 +134,54 @@ export function calculateRevealRounds(params: {
       return true;
     });
 
-    let selectedWinner: (typeof questionVotes)[0] | null = null;
+    let assignedUserId: string | null = null;
+    let assignedUserName: string | null = null;
     let reason: SelectionReason = 'MANUAL';
+    let answeredAtDate: Date | null = null;
 
-    if (totalCount === 0) {
-      reason = 'NO_VOTES';
-      selectedWinner = null;
+    // Ưu tiên 1: Đoán đúng sớm nhất
+    const correctCandidates = eligibleVotes.filter((v) => v.isCorrect);
+    if (correctCandidates.length > 0) {
+      const winnerVote = correctCandidates[0];
+      assignedUserId = winnerVote.userId;
+      assignedUserName = userMap.get(winnerVote.userId)?.fullName || null;
+      reason = 'FASTEST_CORRECT';
+      answeredAtDate = winnerVote.answeredAtDate;
     } else {
-      // Ưu tiên 1: Đoán đúng sớm nhất
-      const correctCandidates = eligibleVotes.filter((v) => v.isCorrect);
-      if (correctCandidates.length > 0) {
-        selectedWinner = correctCandidates[0];
-        reason = 'FASTEST_CORRECT';
+      // Ưu tiên 2: Đoán sai sớm nhất
+      const incorrectCandidates = eligibleVotes.filter((v) => !v.isCorrect);
+      if (incorrectCandidates.length > 0) {
+        const winnerVote = incorrectCandidates[0];
+        assignedUserId = winnerVote.userId;
+        assignedUserName = userMap.get(winnerVote.userId)?.fullName || null;
+        reason = 'FASTEST_INCORRECT';
+        answeredAtDate = winnerVote.answeredAtDate;
       } else {
-        // Ưu tiên 2: Đoán sai sớm nhất
-        const incorrectCandidates = eligibleVotes.filter((v) => !v.isCorrect);
-        if (incorrectCandidates.length > 0) {
-          selectedWinner = incorrectCandidates[0];
-          reason = 'FASTEST_INCORRECT';
+        // Ưu tiên 3 (FALLBACK BẮT BUỘC):
+        // Nếu các điều kiện hiện tại không tìm ra ai, chọn ra 1 người là nam từ danh sách người chơi chưa lên tặng lần nào
+        const unassignedMales = users
+          .filter((u) => u.gender !== 'FEMALE' && !assignedUserIds.has(u.id))
+          .sort((a, b) => a.username.localeCompare(b.username));
+
+        if (unassignedMales.length > 0) {
+          const fallbackWinner = unassignedMales[0];
+          assignedUserId = fallbackWinner.id;
+          assignedUserName = fallbackWinner.fullName;
+          reason = 'LUCKY_FALLBACK';
+          const userVoteForQ = questionVotes.find((v) => v.userId === fallbackWinner.id);
+          answeredAtDate = userVoteForQ ? userVoteForQ.answeredAtDate : null;
         } else {
-          selectedWinner = null;
-          reason = 'MANUAL';
+          // Chỉ khi toàn bộ người chơi nam trong phòng đều đã được gán lên tặng quà
+          assignedUserId = null;
+          assignedUserName = null;
+          reason = totalCount === 0 ? 'NO_VOTES' : 'MANUAL';
+          answeredAtDate = null;
         }
       }
     }
 
-    if (selectedWinner) {
-      assignedUserIds.add(selectedWinner.userId);
+    if (assignedUserId) {
+      assignedUserIds.add(assignedUserId);
     }
 
     results.push({
@@ -173,17 +194,17 @@ export function calculateRevealRounds(params: {
       femaleHint: female.hint,
       totalCorrectGuesses: correctCount,
       totalGuesses: totalCount,
-      assignedUserId: selectedWinner ? selectedWinner.userId : null,
-      assignedUserName: selectedWinner ? userMap.get(selectedWinner.userId)?.fullName || null : null,
+      assignedUserId,
+      assignedUserName,
       selectionReason: reason,
-      answeredAt: selectedWinner ? selectedWinner.answeredAtDate : null,
+      answeredAt: answeredAtDate,
       allVotes: questionVotes.map((v) => ({
         userId: v.userId,
         userName: userMap.get(v.userId)?.fullName || 'Ẩn danh',
         selectedName: v.selectedName,
         isCorrect: v.isCorrect,
         answeredAt: v.answeredAtDate,
-        wasPreviouslyAssigned: assignedUserIds.has(v.userId) && v.userId !== selectedWinner?.userId,
+        wasPreviouslyAssigned: assignedUserIds.has(v.userId) && v.userId !== assignedUserId,
       })),
     });
   }

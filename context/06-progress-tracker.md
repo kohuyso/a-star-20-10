@@ -171,3 +171,32 @@
       3. **Unit Tests & QA Verification**:
          - Bổ sung test case kiểm chứng chống nháy lộ ảnh trong `src/components/shared/mystery-grid-image.test.ts`.
          - Kết quả: `yarn vitest run` 14/14 tests pass, `yarn tsc --noEmit` 0 errors. Đã kiểm tra trực tiếp qua browser subagent.
+
+- **2026-10-19**:
+  - **Khắc phục triệt để lỗi nháy ảnh lộ thông tin khi Admin chuyển sang câu hỏi/ảnh của người khác (`/vote`)**:
+    - **Nguyên nhân cốt lõi**:
+      1. Thiếu React `key` phụ thuộc vào `questionNumber`: Khi Admin chuyển câu hỏi (ví dụ từ câu 1 sang câu 2), React tái sử dụng cây DOM của `MysteryGridImage` và các thẻ tile `div`. Do các tile có CSS `transition-all duration-700 ease-out`, khi đổi trạng thái từ đã mở (`opacity-0`) về che kín (`opacity-100`), chúng mất tới 700ms để đen lại. Đồng thời thuộc tính `src` của thẻ `<img>` đổi sang ảnh mới ngay lập tức. Trong 700ms chuyển giao đó, ảnh người mới bị nhìn thấy rõ ràng dưới các ô mờ.
+      2. Thẻ `<img>` và background ambient blur có CSS `transition-opacity duration-300`/`500`: Khi chuyển câu khiến `revealedTilesSet.size = 0`, ảnh mới fade out chậm trong 300ms thay vì ẩn lập tức.
+      3. State `timeLeft` trong `vote/page.tsx` lưu giá trị `0` của câu trước khi Admin vừa chuyển câu mới.
+    - **Giải pháp xử lý triệt để**:
+      1. **Bổ sung React Key sạch**: Đặt `key={`mystery-grid-${questionNumber}`}` trên `MysteryGridImage`, `key={`tactical-portrait-${questionNumber}`}` trên `TacticalPortrait`, và `key={`question-card-${currentQ.questionNumber}`}` trên `QuestionPhotoCard` & `SlidePhotoDisplay`. Mỗi khi câu hỏi đổi, React unmount hoàn toàn DOM cũ và mount mới toanh ở trạng thái mặc định 100% che kín, triệt tiêu mọi di chứng animation cũ.
+      2. **Tấm chắn bảo vệ tuyệt đối (Solid Blackout Curtain)**: Trong `MysteryGridImage`, khi `revealedTilesSet.size === 0 && !forceRevealAll`, kích hoạt lớp màn che đen cứng `#12161F` ở `z-30` (trên cả ảnh và các ô gạch) với huy hiệu `HỒ SƠ BÍ MẬT #${questionNumber}`. Ảnh mới 100% không thể lọt một pixel nào ra ngoài.
+      3. **Khóa thẻ `<img>` khi che kín**: Khi `isFullyCovered`, thẻ `img` chính và ảnh ambient nhận class `opacity-0 invisible pointer-events-none` ngay lập tức, loại bỏ fade transition gây leak ảnh.
+      4. **Reset `timeLeft` khi đổi câu**: Trong `vote/page.tsx`, thêm `setTimeLeft(0)` ngay trong hook lắng nghe `currentQuestionNumber`.
+    - **Kiểm thử & Xác nhận**: `yarn tsc --noEmit` 0 lỗi, `yarn vitest run` 14/14 tests passing.
+  - **Cập nhật Thuật toán D4: Bắt buộc chọn người trao quà (Fallback Nam chưa tặng lần nào)**:
+    - **Yêu cầu**: Bắt buộc phải có 1 người lên tặng quà cho bạn nữ. Nếu với các điều kiện hiện tại (đoán đúng sớm nhất, đoán sai sớm nhất) không tìm ra ai (ví dụ chưa có ai vote câu đó hoặc mọi người vote câu đó đều đã được trao quà ở các câu khác), thì tự động chọn ra 1 bạn nam từ danh sách người chơi chưa lên tặng lần nào.
+    - **Thực hiện**:
+      1. Sửa thuật toán `calculateRevealRounds` trong `src/lib/game-engine.ts`: Khi cả Ưu tiên 1 (`FASTEST_CORRECT`) và Ưu tiên 2 (`FASTEST_INCORRECT`) đều không tìm được ứng viên, hệ thống lọc danh sách người chơi nam chưa từng được gán (`gender !== "FEMALE"` và `!assignedUserIds.has(user.id)`) và chọn ra bạn nam kế tiếp theo thứ tự sắp xếp deterministic. Lý do gán: `LUCKY_FALLBACK`.
+      2. Cập nhật UI `WinnerSpotlightCard` và `ResultsSummaryTable`: Hiển thị huy hiệu `🎲 CHỌN MAY MẮN (CHƯA TẶNG)`, đồng thời hiển thị đầy đủ tên bạn nam được trao quà và ghi chú đặc cách may mắn thay vì báo rỗng.
+      3. Bổ sung Unit Tests trong `src/lib/game-engine.test.ts` kiểm chứng đầy đủ các kịch bản: câu không ai vote vẫn chọn được bạn nam chưa tặng, câu đã hết người vote hợp lệ chọn được bạn nam chưa tặng, và chỉ khi toàn bộ nam trong phòng đều đã trao quà mới trả về `MANUAL`.
+    - **Kiểm thử & QA**: `yarn tsc --noEmit` 0 lỗi, `yarn vitest run` 16/16 tests passing.
+  - **Cập nhật Gợi ý (Hint) của 14 Bạn Nữ theo Đơn Vị/Team**:
+    - **Yêu cầu**: Đổi gợi ý (hint) của 14 bạn nữ thành thông tin team/phòng ban làm việc tương ứng (PD: Product Delivery, BO: Back Office, astarX: A Star X).
+    - **Thực hiện**:
+      1. Cập nhật danh sách `femaleList` trong `prisma/seed.ts` với gợi ý team chuẩn xác:
+         - Phạm Thị Ánh Tuyết, Ngô Thị Thu Hà, Trần Thanh Hằng, Đặng Quỳnh Chi: `Thuộc team Back Office`
+         - Chu Yến Nhi, Bùi Thị Khánh Huyền, Hoàng Thùy Linh, Nguyễn Thị Minh Phương, Mai Thu Trang: `Thuộc team Product Delivery`
+         - Trần Bảo Yến, Lê Hà Ngân, Lê Khánh Linh, Nguyễn Thị Nhật Anh, Nguyễn Nhật Linh: `Thuộc team A Star X`
+      2. Cập nhật trực tiếp dữ liệu trường `hint` của 14 bạn nữ trong cơ sở dữ liệu SQLite hiện tại mà không làm ảnh hưởng đến các tài khoản hay trạng thái game.
+    - **Kiểm thử**: `yarn tsc --noEmit` 0 lỗi, `yarn vitest run` 16/16 tests passing.

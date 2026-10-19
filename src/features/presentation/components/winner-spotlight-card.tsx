@@ -4,7 +4,7 @@ import { Crown, CheckCircle2, XCircle, Clock, UserCheck, Inbox, Eye } from 'luci
 export interface WinnerSpotlightCardProps {
   totalCorrectGuesses: number;
   totalGuesses: number;
-  selectionReason?: 'FASTEST_CORRECT' | 'FASTEST_INCORRECT' | 'MANUAL' | 'NO_VOTES';
+  selectionReason?: 'FASTEST_CORRECT' | 'FASTEST_INCORRECT' | 'LUCKY_FALLBACK' | 'MANUAL' | 'NO_VOTES';
   assignedUserName?: string | null;
   answeredAt?: string | null;
   revealedWinner: boolean;
@@ -70,6 +70,7 @@ export function WinnerSpotlightCard({
             <span className="px-2.5 py-0.5 rounded-full bg-amber-500/20 border border-amber-500/40 text-amber-300 text-[10px] font-bold">
               {selectionReason === 'FASTEST_CORRECT' && '⚡ ĐOÁN ĐÚNG NHANH NHẤT'}
               {selectionReason === 'FASTEST_INCORRECT' && '🔥 NHANH NHẤT & DŨNG CẢM'}
+              {selectionReason === 'LUCKY_FALLBACK' && '🎲 CHỌN MAY MẮN (CHƯA TẶNG)'}
               {selectionReason === 'MANUAL' && '👑 MC CHỈ ĐỊNH'}
               {selectionReason === 'NO_VOTES' && 'CHƯA CÓ LƯỢT ĐOÁN'}
             </span>
@@ -102,26 +103,30 @@ export function WinnerSpotlightCard({
                 </button>
               </div>
             </div>
-          ) : totalGuesses === 0 ? (
-            <div className="flex flex-col items-center text-center text-zinc-400 py-2 animate-in zoom-in-95 duration-200">
-              <Inbox className="w-8 h-8 text-zinc-600 mb-1" />
-              <p className="text-xs font-semibold text-amber-400/90">Chưa có ai gửi câu trả lời cho câu này</p>
-              <p className="text-[11px] text-zinc-500">MC có thể trao quà tự do hoặc quay số may mắn</p>
-            </div>
-          ) : (
+          ) : assignedUserName ? (
             <div className="flex flex-col items-center text-center animate-in zoom-in-95 duration-300">
               <div className="w-12 h-12 rounded-full bg-gradient-to-tr from-amber-500 to-amber-300 text-zinc-950 flex items-center justify-center font-black text-xl mb-1.5 shadow-lg shadow-amber-500/30">
                 <UserCheck className="w-6 h-6" />
               </div>
               <h3 className="font-headline text-2xl sm:text-3xl font-black text-white">
-                {assignedUserName || 'Chưa gán'}
+                {assignedUserName}
               </h3>
               <p className="text-xs text-zinc-400 mt-0.5 flex items-center gap-1.5">
                 <Clock className="w-3.5 h-3.5 text-zinc-500" />
                 {answeredAt
                   ? `Thời gian nộp: ${new Date(answeredAt).toLocaleTimeString('vi-VN')}`
-                  : 'Không có dữ liệu thời gian'}
+                  : selectionReason === 'LUCKY_FALLBACK'
+                  ? 'Đặc cách may mắn (Chưa trao quà lần nào)'
+                  : 'Chỉ định từ ban tổ chức'}
               </p>
+            </div>
+          ) : (
+            <div className="flex flex-col items-center text-center text-zinc-400 py-2 animate-in zoom-in-95 duration-200">
+              <Inbox className="w-8 h-8 text-zinc-600 mb-1" />
+              <p className="text-xs font-semibold text-amber-400/90">
+                {totalGuesses === 0 ? 'Chưa có ai gửi câu trả lời cho câu này' : 'Tất cả bạn nam đã nhận trao quà'}
+              </p>
+              <p className="text-[11px] text-zinc-500">MC có thể chỉ định người trao quà tiếp theo</p>
             </div>
           )}
         </div>

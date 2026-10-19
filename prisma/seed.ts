@@ -34,20 +34,20 @@ async function main() {
 
   // 3. Danh sách 14 bạn Nữ Astar chính thức (Đúng theo thứ tự ảnh Google Drive)
   const femaleList = [
-    { name: 'Nguyễn Thị Nhật Anh', hint: 'Bóng hồng rạng rỡ của nhà Astar', photoUrl: '/images/female/01-nguyen-thi-nhat-anh.png' },
-    { name: 'Bùi Thị Khánh Huyền', hint: 'Cô gái trẻ trung và đầy nhiệt huyết', photoUrl: '/images/female/02-bui-thi-khanh-huyen.png' },
-    { name: 'Hoàng Thùy Linh', hint: 'Nụ cười tỏa nắng và thông minh', photoUrl: '/images/female/03-hoang-thuy-linh.jpg' },
-    { name: 'Nguyễn Nhật Linh', hint: 'Thành viên năng động, tài năng của Astar', photoUrl: '/images/female/04-nguyen-nhat-linh.png' },
-    { name: 'Mai Thu Trang', hint: 'Dịu dàng, chu đáo và tinh tế', photoUrl: '/images/female/05-mai-thu-trang.jpg' },
-    { name: 'Ngô Thị Thu Hà', hint: 'Cô nàng cá tính và trách nhiệm', photoUrl: '/images/female/06-ngo-thi-thu-ha.png' },
-    { name: 'Phạm Thị Ánh Tuyết', hint: 'Người chị cả dịu hiền và gương mẫu của team', photoUrl: '/images/female/13-pham-thi-anh-tuyet.png' },
-    { name: 'Nguyễn Thị Minh Phương', hint: 'Tươi tắn, thông minh và hoạt bát', photoUrl: '/images/female/08-nguyen-thi-minh-phuong.jpeg' },
-    { name: 'Lê Hà Ngân', hint: 'Năng nổ, nhiệt tình và sáng tạo', photoUrl: '/images/female/09-le-ha-ngan.png' },
-    { name: 'Trần Bảo Yến', hint: 'Cô gái xinh xắn và đáng yêu', photoUrl: '/images/female/10-tran-bao-yen.png' },
-    { name: 'Chu Yến Nhi', hint: 'Nụ cười duyên dáng và tích cực', photoUrl: '/images/female/11-chu-yen-nhi.jpg' },
-    { name: 'Trần Thanh Hằng', hint: 'Tươi vui, chu đáo và hòa đồng', photoUrl: '/images/female/12-tran-thanh-hang.png' },
-    { name: 'Lê Khánh Linh', hint: 'Nét đẹp thanh lịch và vui vẻ', photoUrl: '/images/female/07-le-khanh-linh.png' },
-    { name: 'Đặng Quỳnh Chi', hint: 'Nàng thơ phong cách và đáng mến', photoUrl: '/images/female/14-dang-quynh-chi.png' },
+    { name: 'Nguyễn Thị Nhật Anh', hint: 'Thuộc team A Star X', photoUrl: '/images/female/01-nguyen-thi-nhat-anh.png' },
+    { name: 'Bùi Thị Khánh Huyền', hint: 'Thuộc team Product Delivery', photoUrl: '/images/female/02-bui-thi-khanh-huyen.png' },
+    { name: 'Hoàng Thùy Linh', hint: 'Thuộc team Product Delivery', photoUrl: '/images/female/03-hoang-thuy-linh.jpg' },
+    { name: 'Nguyễn Nhật Linh', hint: 'Thuộc team A Star X', photoUrl: '/images/female/04-nguyen-nhat-linh.png' },
+    { name: 'Mai Thu Trang', hint: 'Thuộc team Product Delivery', photoUrl: '/images/female/05-mai-thu-trang.jpg' },
+    { name: 'Ngô Thị Thu Hà', hint: 'Thuộc team Back Office', photoUrl: '/images/female/06-ngo-thi-thu-ha.png' },
+    { name: 'Phạm Thị Ánh Tuyết', hint: 'Thuộc team Back Office', photoUrl: '/images/female/13-pham-thi-anh-tuyet.png' },
+    { name: 'Nguyễn Thị Minh Phương', hint: 'Thuộc team Product Delivery', photoUrl: '/images/female/08-nguyen-thi-minh-phuong.jpeg' },
+    { name: 'Lê Hà Ngân', hint: 'Thuộc team A Star X', photoUrl: '/images/female/09-le-ha-ngan.png' },
+    { name: 'Trần Bảo Yến', hint: 'Thuộc team A Star X', photoUrl: '/images/female/10-tran-bao-yen.png' },
+    { name: 'Chu Yến Nhi', hint: 'Thuộc team Product Delivery', photoUrl: '/images/female/11-chu-yen-nhi.jpg' },
+    { name: 'Trần Thanh Hằng', hint: 'Thuộc team Back Office', photoUrl: '/images/female/12-tran-thanh-hang.png' },
+    { name: 'Lê Khánh Linh', hint: 'Thuộc team A Star X', photoUrl: '/images/female/07-le-khanh-linh.png' },
+    { name: 'Đặng Quỳnh Chi', hint: 'Thuộc team Back Office', photoUrl: '/images/female/14-dang-quynh-chi.png' },
   ];
 
   // Xóa các câu hỏi hoặc profile mock cũ nếu có

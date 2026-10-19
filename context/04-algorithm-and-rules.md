@@ -32,11 +32,14 @@ Với bạn nữ hiện tại $F_k$:
    - $V_{incorrect} = \{ v \in V_k \mid v.isCorrect = false \}$
    - Sắp xếp $V_{incorrect}$ theo `answeredAt` ASC.
    - Nếu $V_{incorrect}$ không rỗng $\rightarrow$ Chọn $v^* = V_{incorrect}[0]$. Lý do: `FASTEST_INCORRECT`.
-4. **Xét Ưu tiên 3 (Hết người chơi đủ điều kiện / Fallback)**:
-   - Nếu $V_k$ rỗng (do số lượng người chơi < 14 hoặc mọi người đều đã được chọn):
-   - Đánh dấu vòng này cần MC chỉ định thủ công: `assignedUserId = null`, Lý do: `MANUAL`.
-5. Nếu tìm được $v^*$:
-   - Thêm $v^*.userId$ vào `assignedUserIds`.
+4. **Xét Ưu tiên 3 (BẮT BUỘC CÓ NGƯỜI TẶNG - Fallback chọn Nam chưa tặng lần nào)**:
+   - Nếu cả 2 ưu tiên trên không tìm ra ai (do câu này chưa có ai vote, hoặc tất cả người vote đều đã nhận giải trước đó / là nữ):
+   - **Bắt buộc phải có 1 người lên tặng quà**: Chọn ra 1 bạn nam từ danh sách người chơi nam chưa lên tặng lần nào:
+     $U_{unassigned} = \{ u \in Users \mid u.gender \neq 'FEMALE' \wedge u.id \notin assignedUserIds \}$
+   - Nếu $U_{unassigned}$ không rỗng: Chọn bạn nam đầu tiên (sắp xếp deterministic theo username). Lý do: `LUCKY_FALLBACK`.
+   - Nếu ngay cả $U_{unassigned}$ cũng rỗng (toàn bộ nam trong phòng đều đã trao quà): Để trống `assignedUserId = null`, Lý do: `MANUAL` / `NO_VOTES`.
+5. Nếu tìm được người trao quà:
+   - Thêm `userId` vào `assignedUserIds`.
    - Lưu kết quả vòng vào bảng `RoundResult`.
 
 ---

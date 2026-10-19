@@ -113,18 +113,52 @@ describe('Epic D4: calculateRevealRounds', () => {
     expect(results[0].selectionReason).toBe('FASTEST_INCORRECT');
   });
 
-  it('ưu tiên 3 (fallback): nếu tất cả người chơi đều đã nhận quà, trả về MANUAL để MC chỉ định', () => {
+  it('ưu tiên 3 (bắt buộc fallback): nếu không tìm ra ai theo lượt vote, chọn ra 1 bạn nam chưa lên tặng quà lần nào', () => {
     const votes: VoteInput[] = [
       { id: 'v1', userId: 'u1', questionId: 'q1', selectedName: 'Nguyễn Thị A', isCorrect: true, answeredAt: '2026-10-09T10:00:10Z' },
     ];
 
-    // Giả sử u1 đã được chọn từ trước
+    // Giả sử u1 đã được chọn từ trước (chỉ còn u2, u3, u4 chưa chọn)
     const results = calculateRevealRounds({
       femaleProfiles: [mockFemales[0]],
       questions: [mockQuestions[0]],
       votes,
       users: mockUsers,
       initialAssignedUserIds: ['u1'],
+    });
+
+    // Bắt buộc phải có 1 người lên tặng quà từ danh sách nam chưa tặng (u2 là nam2)
+    expect(results[0].assignedUserId).toBe('u2');
+    expect(results[0].assignedUserName).toBe('Trần Văn Nam 2');
+    expect(results[0].selectionReason).toBe('LUCKY_FALLBACK');
+  });
+
+  it('khi câu hỏi hoàn toàn không có ai vote, vẫn bắt buộc chọn ra 1 bạn nam chưa lên tặng', () => {
+    const results = calculateRevealRounds({
+      femaleProfiles: [mockFemales[0]],
+      questions: [mockQuestions[0]],
+      votes: [], // Không có ai vote
+      users: mockUsers,
+      initialAssignedUserIds: [],
+    });
+
+    expect(results[0].assignedUserId).toBe('u1');
+    expect(results[0].assignedUserName).toBe('Nguyễn Văn Nam 1');
+    expect(results[0].selectionReason).toBe('LUCKY_FALLBACK');
+  });
+
+  it('nếu thực sự toàn bộ người chơi nam đều đã nhận trao quà hết, trả về MANUAL để MC xử lý', () => {
+    const votes: VoteInput[] = [
+      { id: 'v1', userId: 'u1', questionId: 'q1', selectedName: 'Nguyễn Thị A', isCorrect: true, answeredAt: '2026-10-09T10:00:10Z' },
+    ];
+
+    // Cả 4 bạn nam u1, u2, u3, u4 đều đã được chọn trao quà ở các câu trước
+    const results = calculateRevealRounds({
+      femaleProfiles: [mockFemales[0]],
+      questions: [mockQuestions[0]],
+      votes,
+      users: mockUsers,
+      initialAssignedUserIds: ['u1', 'u2', 'u3', 'u4'],
     });
 
     expect(results[0].assignedUserId).toBeNull();

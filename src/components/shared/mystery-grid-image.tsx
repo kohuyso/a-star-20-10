@@ -125,30 +125,46 @@ export function MysteryGridImage({
     totalTiles,
   ]);
 
+  const isFullyCovered = revealedTilesSet.size === 0 && !forceRevealAll;
+
   return (
     <div className={`relative w-full h-full flex items-center justify-center overflow-hidden select-none bg-[#0B0E14] ${className}`}>
-      {/* 1. Lớp nền ambient mờ ảo từ chính bức ảnh: Lấp đầy 100% khung card, xóa sạch hoàn toàn khoảng đen 2 bên (padding giả lập) */}
+      {/* 1. Màn chắn bảo mật tuyệt đối (Solid Blackout Curtain) chống lộ/nháy ảnh khi chưa mở ô nào */}
+      {isFullyCovered && (
+        <div className="absolute inset-0 z-30 bg-[#12161F] pointer-events-none flex flex-col items-center justify-center select-none">
+          <div className="w-12 h-12 rounded-2xl bg-zinc-900 border border-zinc-700/60 flex items-center justify-center shadow-inner mb-2.5">
+            <span className="text-[#DC2626] font-mono font-black text-sm">#{questionNumber}</span>
+          </div>
+          <span className="text-[10px] font-mono text-zinc-400 font-bold uppercase tracking-widest">
+            HỒ SƠ BÍ MẬT #{questionNumber}
+          </span>
+        </div>
+      )}
+
+      {/* 2. Lớp nền ambient mờ ảo từ chính bức ảnh: Lấp đầy 100% khung card, xóa sạch hoàn toàn khoảng đen 2 bên (padding giả lập) */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src={src}
         alt=""
         aria-hidden="true"
-        className={`absolute inset-0 w-full h-full object-cover blur-2xl scale-125 opacity-35 transition-opacity duration-500 pointer-events-none select-none ${
-          revealedTilesSet.size === 0 ? 'opacity-0' : 'opacity-35'
+        className={`absolute inset-0 w-full h-full object-cover blur-2xl scale-125 pointer-events-none select-none ${
+          isFullyCovered ? 'opacity-0 invisible' : 'opacity-35 visible transition-opacity duration-500'
         }`}
       />
 
-      {/* 2. Ảnh gốc chính giữa (object-contain giữ trọn 100% chi tiết, không bao giờ bị cắt xén) */}
+      {/* 3. Ảnh gốc chính giữa (object-contain giữ trọn 100% chi tiết, không bao giờ bị cắt xén) */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src={src}
         alt={alt}
-        className={`relative z-10 w-full h-full object-contain transition-opacity duration-300 block select-none drop-shadow-2xl ${
-          revealedTilesSet.size === 0 ? 'opacity-0' : 'opacity-100'
+        className={`relative z-10 w-full h-full object-contain block select-none drop-shadow-2xl ${
+          isFullyCovered
+            ? 'opacity-0 invisible pointer-events-none'
+            : 'opacity-100 visible transition-opacity duration-300'
         } ${imageClassName}`}
       />
 
-      {/* 3. Lớp phủ lưới ô vuông (Mystery Grid Overlay) - phủ trọn vẹn 100% diện tích card đồng nhất */}
+      {/* 4. Lớp phủ lưới ô vuông (Mystery Grid Overlay) - phủ trọn vẹn 100% diện tích card đồng nhất */}
       <div
         className="absolute inset-0 grid pointer-events-none z-20"
         style={{
